@@ -1,166 +1,206 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import Colors from '../../constants/Colors';
-import { useAuth } from '../../hooks/useAuth';
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
+import { Link } from "expo-router";
+import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
 
-interface RegisterFormProps {}
-
-const RegisterForm: React.FC<RegisterFormProps> = () => {
-  const [isCompany, setIsCompany] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [address, setAddress] = useState('');
-  const [taxId, setTaxId] = useState(''); // For companies
-  const [idFrontImage, setIdFrontImage] = useState(''); // Placeholder for image upload
-  const [idBackImage, setIdBackImage] = useState('');   // Placeholder for image upload
-  const [phoneNumber, setPhoneNumber] = useState('');
+const RegisterForm: React.FC = () => {
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [taxId, setTaxId] = useState("");
+  const [idFrontImage, setIdFrontImage] = useState(""); // Placeholder for image upload
+  const [idBackImage, setIdBackImage] = useState(""); // Placeholder for image upload
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [agbChecked, setAgbChecked] = useState(false);
-  const [datenschutzChecked, setDatenschutzChecked] = useState(false);
+  const [privacyChecked, setPrivacyChecked] = useState(false);
   const { register, loading, error } = useAuth();
 
-  const handleRegistration = async () => {
-    if (password !== confirmPassword) {
-      console.error("Passwords do not match");
+  const handleRegister = async () => {
+    if (!agbChecked || !privacyChecked) {
+      console.error("Please accept the terms and privacy policy.");
+      // Set an error state to display to the user
       return;
     }
-
-    const additionalData = isCompany
-      ? { address, taxId }
-      : { firstName, lastName, address };
-
-    await register(email, password, isCompany, additionalData);
-
+    if (password !== confirmPassword) {
+      console.error("Passwords do not match!");
+      // Set an error state to display to the user
+      return;
+    }
+    // In a real application, you would likely collect all the form data
+    const registrationData = {
+      lastName,
+      firstName,
+      email,
+      address,
+      taxId,
+      idFrontImage,
+      idBackImage,
+      phoneNumber,
+      // You might not send password directly here depending on your backend
+    };
+    await register(email, password, false, registrationData); // Assuming not a company registration here
     if (!loading && !error) {
-      console.log('Registration successful!');
+      console.log("Registration successful!");
+      // Potentially navigate the user
     } else if (error) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
     }
   };
 
   return (
-    <View className="flex-1 bg-white p-6 justify-center">
-      {/* Tab Switching */}
-      <View className="flex-row justify-around mb-4">
-        <TouchableOpacity onPress={() => setIsCompany(false)} className={`py-2 px-4 rounded-md ${!isCompany ? 'bg-gray-200' : ''}`}>
-          <Text className="text-lg">{isCompany ? 'User' : 'User'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setIsCompany(true)} className={`py-2 px-4 rounded-md ${isCompany ? 'bg-gray-200' : ''}`}>
-          <Text className="text-lg">{isCompany ? 'Company' : 'Company'}</Text>
-        </TouchableOpacity>
+    <View className="flex-1 items-center bg-white px-6 py-10">
+      <Text className="text-3xl font-bold text-black mb-6">
+        Registriere dich!
+      </Text>
+
+      <View className="flex-row justify-between w-full mb-4 gap-2">
+        <TextInput
+          placeholder="Nachname"
+          className="flex-1 p-3 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+          value={lastName}
+          onChangeText={setLastName}
+        />
+        <TextInput
+          placeholder="Vorname"
+          className="flex-1 p-3 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
       </View>
 
-      <Text className="text-2xl font-bold mb-6">Registriere dich!</Text>
-
-      {!isCompany && (
-        <>
-          <View className="flex-row justify-between mb-2">
-            <TextInput
-              className="w-1/2 mr-2 px-4 py-2 border border-gray-300 rounded-md"
-              placeholder="Vorname"
-              value={firstName}
-              onChangeText={setFirstName}
-            />
-            <TextInput
-              className="w-1/2 ml-2 px-4 py-2 border border-gray-300 rounded-md"
-              placeholder="Nachname"
-              value={lastName}
-              onChangeText={setLastName}
-            />
-          </View>
-        </>
-      )}
+      <View className="w-full mb-4">
+        <TextInput
+          placeholder="E-Mail"
+          className="w-full p-3 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <View className="absolute left-3 top-3">
+          <FontAwesome name="envelope-o" size={20} color="gray" />
+        </View>
+      </View>
 
       <TextInput
-        className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md"
-        placeholder="E-Mail"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-
-      <TextInput
-        className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md"
         placeholder="Adresse"
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
         value={address}
         onChangeText={setAddress}
       />
 
-      {isCompany && (
-        <TextInput
-          className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md"
-          placeholder="Steuer ID / Umsatzsteuer ID"
-          value={taxId}
-          onChangeText={setTaxId}
-        />
-      )}
+      <TextInput
+        placeholder="Steuer ID / Umsatzsteuer ID"
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+        value={taxId}
+        onChangeText={setTaxId}
+      />
 
-      <TouchableOpacity className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md justify-start">
-        <Text className="text-gray-500">Bild vom Personalausweis Vorderseite</Text>
-        {/* Implement image upload logic here */}
+      <TouchableOpacity
+        onPress={() => console.log("Upload ID Front")}
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm items-start justify-center"
+      >
+        <Text className="text-gray-500">
+          Bild vom Personalausweis Vorderseite
+        </Text>
+        {idFrontImage ? <Text>{idFrontImage}</Text> : null}
       </TouchableOpacity>
 
-      <TouchableOpacity className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md justify-start">
-        <Text className="text-gray-500">Bild vom Personalausweis Rückseite</Text>
-        {/* Implement image upload logic here */}
+      <TouchableOpacity
+        onPress={() => console.log("Upload ID Back")}
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm items-start justify-center"
+      >
+        <Text className="text-gray-500">
+          Bild vom Personalausweis Rückseite
+        </Text>
+        {idBackImage ? <Text>{idBackImage}</Text> : null}
       </TouchableOpacity>
 
       <TextInput
-        className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md"
         placeholder="Telefonnummer - WhatsApp"
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
         keyboardType="phone-pad"
         value={phoneNumber}
         onChangeText={setPhoneNumber}
       />
 
       <TextInput
-        className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md"
         placeholder="Passwort"
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
 
       <TextInput
-        className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md"
         placeholder="Passwort wiederholen"
+        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
 
-      {/* Terms and Privacy Checkboxes */}
-      <View className="flex-row justify-between mb-4">
-        <TouchableOpacity className="flex-row items-center">
-          <View className={`w-5 h-5 border border-gray-400 rounded mr-2 justify-center items-center ${agbChecked ? 'bg-primary' : ''}`}>
-            {agbChecked && <Text className="text-white">✓</Text>}
+      <View className="flex-row w-full mb-6 gap-2">
+        <TouchableOpacity
+          onPress={() => setAgbChecked(!agbChecked)}
+          className={`flex-1 flex-row items-center p-3 rounded-xl bg-[#F5F7FA] ${
+            agbChecked ? "border-[#7C5CFC] border-2" : ""
+          }`}
+        >
+          <View
+            className={`w-5 h-5 rounded-md border border-gray-400 mr-2 items-center justify-center ${
+              agbChecked ? "bg-[#7C5CFC]" : "bg-white"
+            }`}
+          >
+            {agbChecked && <AntDesign name="check" size={16} color="white" />}
           </View>
-          <Text>AGB</Text>
+          <Text className="text-sm">AGB</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-row items-center">
-          <View className={`w-5 h-5 border border-gray-400 rounded mr-2 justify-center items-center ${datenschutzChecked ? 'bg-primary' : ''}`}>
-            {datenschutzChecked && <Text className="text-white">✓</Text>}
+
+        <TouchableOpacity
+          onPress={() => setPrivacyChecked(!privacyChecked)}
+          className={`flex-1 flex-row items-center p-3 rounded-xl bg-[#F5F7FA] ${
+            privacyChecked ? "border-[#7C5CFC] border-2" : ""
+          }`}
+        >
+          <View
+            className={`w-5 h-5 rounded-md border border-gray-400 mr-2 items-center justify-center ${
+              privacyChecked ? "bg-white" : "bg-white"
+            }`}
+          >
+            {privacyChecked && (
+              <AntDesign name="check" size={16} color="white" />
+            )}
           </View>
-          <Text>Datenschutz</Text>
+          <Text className="text-sm">Datenschutz</Text>
         </TouchableOpacity>
       </View>
 
-      <Button
-        title={loading ? 'Registrieren...' : 'Jetzt registrieren'}
-        onPress={handleRegistration}
-        disabled={loading || !agbChecked || !datenschutzChecked}
-        color={Colors.primary}
-      />
+      <TouchableOpacity
+        onPress={handleRegister}
+        disabled={loading || !agbChecked || !privacyChecked}
+        className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
+          loading || !agbChecked || !privacyChecked ? "opacity-50" : ""
+        }`}
+      >
+        <Text className="text-white font-semibold text-base">
+          {loading ? "Registrieren..." : "Jetzt registrieren"}
+        </Text>
+      </TouchableOpacity>
 
-      {error && <Text className="text-red-500 mt-4">{error}</Text>}
+      {error && <Text className="text-red-500 mt-2 text-center">{error}</Text>}
+
+      <Text className="text-gray-500 mt-4">
+        Hast du bereits ein Konto?{" "}
+        <Link href="/(auth)/login" className="text-[#7C5CFC] font-semibold">
+          Anmelden
+        </Link>
+      </Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  // You can add more specific styles here if needed
-});
 
 export default RegisterForm;
