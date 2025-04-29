@@ -36,7 +36,7 @@
 │   ├── UI/
 │   │   ├── Button.tsx
 │   │   ├── ProductCard.tsx       # Reusable product card component
-│   │   └── [other-reusable-components].tsx
+│   │   └── BottomNav.tsx
 │   ├── Products/
 │   │   └── ProductForm.tsx       # Reusable product form component
 │   └── Notifications/
