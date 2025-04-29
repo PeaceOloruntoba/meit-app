@@ -10,12 +10,14 @@
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy"
   },
   "dependencies": {
+    "dotenv": "^16.5.0",
     "expo": "^52.0.16",
     "expo-constants": "~17.0.3",
     "expo-linking": "~7.0.3",
     "expo-router": "~4.0.11",
     "expo-splash-screen": "~0.29.13",
     "expo-status-bar": "~2.0.0",
+    "firebase": "^11.6.1",
     "meit-app": "file:",
     "nativewind": "^4.0.1",
     "react": "18.3.1",
