@@ -9,7 +9,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style="auto" backgroundColor={Colors.background} />
+        <StatusBar style="dark" backgroundColor={Colors.background} />
         <Slot />
       </AuthProvider>
     </SafeAreaProvider>
