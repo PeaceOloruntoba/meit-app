@@ -24,6 +24,16 @@ const AppLayout = () => {
     determineUserRole();
   }, [user]);
 
+  useEffect(() => {
+    if (isAuthenticated && isCompanyUser !== null) {
+      if (isCompanyUser && !pathname?.startsWith("/companies")) {
+        router.replace("/companies");
+      } else if (!isCompanyUser && !pathname?.startsWith("/users")) {
+        router.replace("/users");
+      }
+    }
+  }, [isAuthenticated, isCompanyUser, pathname, router]);
+
   if (loading || isCompanyUser === null) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
@@ -35,19 +45,6 @@ const AppLayout = () => {
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/login" />;
   }
-
-  // Conditional Routing
-  useEffect(() => {
-    if (isAuthenticated && isCompanyUser) {
-      if (!pathname?.startsWith("/companies")) {
-        router.replace("/companies");
-      }
-    } else if (isAuthenticated && !isCompanyUser) {
-      if (!pathname?.startsWith("/users")) {
-        router.replace("/users");
-      }
-    }
-  }, [isAuthenticated, isCompanyUser, pathname, router]);
 
   const userNavigationItems = [
     { href: "/users", label: "Home", icon: <Text>🏠</Text> }, // Example icon
