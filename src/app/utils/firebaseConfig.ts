@@ -13,7 +13,6 @@ const firebaseStorageBucket =
 const firebaseMessagingSenderId =
   Constants.expoConfig?.extra?.firebaseMessagingSenderId;
 const firebaseAppId = Constants.expoConfig?.extra?.firebaseAppId;
-// const firebaseDatabaseURL = Constants.expoConfig?.extra?.firebaseDatabaseURL; // If using Realtime Database
 
 const firebaseConfig = {
   apiKey: firebaseApiKey,
@@ -22,7 +21,6 @@ const firebaseConfig = {
   storageBucket: firebaseStorageBucket,
   messagingSenderId: firebaseMessagingSenderId,
   appId: firebaseAppId,
-  // databaseURL: firebaseDatabaseURL, // If using Realtime Database
 };
 
 let app;

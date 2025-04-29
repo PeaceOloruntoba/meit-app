@@ -30,37 +30,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const db = getFirestore(auth.app); // Initialize Firestore with the Firebase app instance
+  const db = getFirestore(auth?.app); // Use optional chaining in case auth is null
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-      if (authUser) {
-        const userDocRef = doc(db, authUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          setUser({ uid: authUser.uid, ...userDocSnap.data() });
-          setIsAuthenticated(true);
+    let unsubscribe: (() => void) | undefined;
+    if (auth) {
+      unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+        if (authUser) {
+          const userDocRef = doc(db, authUser.uid);
+          try {
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              setUser({ uid: authUser.uid, ...userDocSnap.data() });
+              setIsAuthenticated(true);
+            } else {
+              setUser({ uid: authUser.uid, email: authUser.email });
+              setIsAuthenticated(true);
+            }
+          } catch (e: any) {
+            console.error("Error fetching user data:", e.message);
+            setError("Failed to fetch user data.");
+          } finally {
+            setLoading(false);
+          }
         } else {
-          // Handle the case where user data doesn't exist in Firestore
-          setUser({ uid: authUser.uid, email: authUser.email }); // Basic user info
-          setIsAuthenticated(true);
+          setUser(null);
+          setIsAuthenticated(false);
+          setLoading(false);
         }
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
+      });
+    } else {
+      console.warn("Firebase Auth not initialized.");
       setLoading(false);
-    });
+    }
 
-    return () => unsubscribe();
-  }, []);
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [db, auth]); // Add db and auth to the dependency array
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      if (auth) {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        setError("Authentication not initialized.");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -77,21 +96,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const newUser = userCredential.user;
-      const userDocRef = doc(db, newUser.uid);
-      const userData = {
-        email: newUser.email,
-        isCompany: isCompany,
-        ...additionalData,
-      };
-      await setDoc(userDocRef, userData);
-      setUser({ uid: newUser.uid, ...userData });
-      setIsAuthenticated(true);
+      if (auth) {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const newUser = userCredential.user;
+        const userDocRef = doc(db, newUser.uid);
+        const userData = {
+          email: newUser.email,
+          isCompany: isCompany,
+          ...additionalData,
+        };
+        await setDoc(userDocRef, userData);
+        setUser({ uid: newUser.uid, ...userData });
+        setIsAuthenticated(true);
+      } else {
+        setError("Authentication not initialized.");
+      }
     } catch (err: any) {
       setError(err.message);
       setIsAuthenticated(false);
@@ -105,9 +128,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      await signOut(auth);
-      setUser(null);
-      setIsAuthenticated(false);
+      if (auth) {
+        await signOut(auth);
+        setUser(null);
+        setIsAuthenticated(false);
+      } else {
+        setError("Authentication not initialized.");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
