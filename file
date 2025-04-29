@@ -15,13 +15,14 @@
 │   │   │   ├── _layout.tsx      # Layout for company screens
 │   │   │   ├── index.tsx         # Company dashboard
 │   │   │   ├── profile.tsx      # Profile screen
+│   │   │   ├── [rental].tsx      # A single rental to approve or disapprove
 │   │   │   ├── [profile-edit].tsx # Edit Company profile
 │   │   │   ├── products/
 │   │   │   │   ├── _layout.tsx  # Layout for product management
 │   │   │   │   ├── create.tsx    # Create product screen
 │   │   │   │   ├── [product-id].tsx # Edit product screen
 │   │   │   │   └── list.tsx      # List of company's products
-│   │   │   └── rentals.tsx
+│   │   │   └── rentals.tsx      # Rentals Screen for list of rented items or products
 │   │   ├── notifications.tsx    # Notifications screen for both users and companies
 │   │   └── profile.tsx          # User profile screen
 │   └── (auth)/                  # Authentication routes (unprotected)
