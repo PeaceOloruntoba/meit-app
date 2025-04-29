@@ -32,7 +32,7 @@
 ├── components/
 │   ├── Auth/
 │   │   ├── RegisterForm.tsx     # Combined registration form with tab switching
-│   │   └── [other-auth-components].tsx
+│   │   └── LoginForm.tsx
 │   ├── UI/
 │   │   ├── Button.tsx
 │   │   ├── ProductCard.tsx       # Reusable product card component
