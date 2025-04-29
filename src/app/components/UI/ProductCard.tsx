@@ -2,28 +2,36 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import Colors from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons"; // Example icons
 
 interface ProductCardProps {
   id: string; // Unique identifier for the product
   name: string;
   imageUrl?: string;
-  description?: string;
-  price?: number;
-  // Add other relevant product details
+  deposit?: number | string;
+  deliveryCost?: number | string;
+  pricePerDay?: number | string;
+  pricePerMonth?: number | string;
+  pickupAvailable?: boolean;
+  distance?: string; // e.g., "20km"
 }
-
-const router = useRouter();
 
 const ProductCard: React.FC<ProductCardProps> = ({
   id,
   name,
   imageUrl,
-  description,
-  price,
+  deposit,
+  deliveryCost,
+  pricePerDay,
+  pricePerMonth,
+  pickupAvailable,
+  distance,
 }) => {
+  const router = useRouter();
+
   return (
     <TouchableOpacity
-      onPress={() => router.navigate(`/users/[product-details]?id=${id}`)}
+      onPress={() => router.navigate(`/companies/products/${id}`)}
       className="bg-white rounded-md overflow-hidden mb-4 shadow-md"
     >
       {imageUrl ? (
@@ -38,17 +46,43 @@ const ProductCard: React.FC<ProductCardProps> = ({
       )}
       <View className="p-4">
         <Text className="text-lg font-bold mb-1 text-black">{name}</Text>
-        {description && (
-          <Text className="text-sm text-gray-600 mb-2 line-clamp-2">
-            {description}
+        {deposit !== undefined && (
+          <Text className="text-sm text-gray-600 mb-1">
+            Kaution:{" "}
+            {typeof deposit === "number" ? deposit.toFixed(2) + " €" : deposit}
           </Text>
         )}
-        {price !== undefined && (
+        {deliveryCost !== undefined && (
+          <Text className="text-sm text-gray-600 mb-1">
+            Lieferkosten:{" "}
+            {typeof deliveryCost === "number"
+              ? deliveryCost.toFixed(2) + " €"
+              : deliveryCost}
+          </Text>
+        )}
+        {pricePerDay !== undefined && (
           <Text className="text-base font-semibold text-primary">
-            ${price?.toFixed(2)}
+            {typeof pricePerDay === "number"
+              ? pricePerDay.toFixed(0) + " € pro Tag"
+              : pricePerDay + " pro Tag"}
           </Text>
         )}
-        {/* Add more details as needed */}
+        {pricePerMonth !== undefined && (
+          <Text className="text-base font-semibold text-primary">
+            {typeof pricePerMonth === "number"
+              ? pricePerMonth.toFixed(0) + " € pro Monat"
+              : pricePerMonth + " pro Monat"}
+          </Text>
+        )}
+        {pickupAvailable && (
+          <Text className="text-sm text-gray-600 mb-1">Abholung möglich</Text>
+        )}
+        {distance && (
+          <View className="flex-row items-center mt-1">
+            <Ionicons name="location-sharp" size={14} color={Colors.secondary} />
+            <Text className="text-xs text-gray-600 ml-1">{distance}</Text>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
