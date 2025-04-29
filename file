@@ -9,7 +9,8 @@
 │   │   │   ├── [product-details].tsx # Product details screen
 │   │   │   ├── search.tsx        # Search screen
 │   │   │   ├── booking.tsx       # Booking/rental screens
-│   │   │   └── [other-user-screens].tsx
+│   │   │   ├── profile.tsx      # Profile screen
+│   │   │   └── [profile-edit].tsx # Edit Profile screen
 │   │   ├── companies/
 │   │   │   ├── _layout.tsx      # Layout for company screens
 │   │   │   ├── index.tsx         # Company dashboard
