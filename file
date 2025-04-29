@@ -14,6 +14,8 @@
 │   │   ├── companies/
 │   │   │   ├── _layout.tsx      # Layout for company screens
 │   │   │   ├── index.tsx         # Company dashboard
+│   │   │   ├── profile.tsx      # Profile screen
+│   │   │   ├── [profile-edit].tsx # Edit Company profile
 │   │   │   ├── products/
 │   │   │   │   ├── _layout.tsx  # Layout for product management
 │   │   │   │   ├── create.tsx    # Create product screen
