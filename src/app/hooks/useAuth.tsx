@@ -6,10 +6,10 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-import { Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 interface AuthContextType {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (
@@ -28,7 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // Initialize as null
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,21 +105,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-//   return (
-//     <AuthContext.Provider
-//       value={{
-//         isAuthenticated: !!isAuthenticated
-//         user
-//         login
-//         register
-//         logout
-//         loading
-//         error
-//       }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   );
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user,
+        login,
+        register,
+        logout,
+        loading,
+        error,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
