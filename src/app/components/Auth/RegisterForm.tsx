@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Switch,
-  Image,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
 import { Link } from "expo-router";
-import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
+import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { toast } from "sonner-native";
 
 const RegisterForm: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<"user" | "company">("user");
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +20,6 @@ const RegisterForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agbChecked, setAgbChecked] = useState(false);
   const [privacyChecked, setPrivacyChecked] = useState(false);
-  const [isCompany, setIsCompany] = useState(false); // State to track registration type
   const { register, loading, error } = useAuth();
 
   const pickImage = async (setImageState: (uri: string | null) => void) => {
@@ -56,70 +50,148 @@ const RegisterForm: React.FC = () => {
       console.error("Passwords do not match!");
       return;
     }
+    const isCompanyRegistration = activeTab === "company";
     const registrationData = {
       lastName,
       firstName,
       email,
       address,
       phoneNumber,
-      ...(isCompany && { taxId, idFrontImage, idBackImage }), // Include company-specific fields
+      ...(isCompanyRegistration && { taxId, idFrontImage, idBackImage }),
     };
-    await register(email, password, isCompany, registrationData);
+    await register(email, password, isCompanyRegistration, registrationData);
     if (!loading && !error) {
       console.log("Registration successful!");
+      toast.success("Registration Successful!");
     } else if (error) {
       console.error("Registration error:", error);
     }
   };
 
   return (
-    <View className="flex-1 items-center bg-white px-6 py-10">
-      <Text className="text-3xl font-bold text-black mb-6">
-        {isCompany ? "Firmenkonto erstellen" : "Benutzerkonto erstellen"}
+    <View className="flex-1 items-center justify-center bg-[#F5F7FA] px-6">
+      <Text className="text-3xl font-bold text-black mt-10 mb-4">
+        Registriere dich!
       </Text>
 
-      <View className="flex-row w-full mb-6 items-center justify-center">
-        <Text className="text-gray-700 mr-2">Als Firma registrieren?</Text>
-        <Switch value={isCompany} onValueChange={setIsCompany} />
+      {/* Tab Bar */}
+      <View className="flex-row w-full mb-6 rounded-xl overflow-hidden bg-white shadow-sm">
+        <TouchableOpacity
+          onPress={() => setActiveTab("user")}
+          className={`flex-1 p-3 items-center justify-center ${
+            activeTab === "user" ? "bg-[#7C5CFC]" : "bg-white"
+          }`}
+        >
+          <Text
+            className={`font-semibold ${
+              activeTab === "user" ? "text-white" : "text-gray-700"
+            }`}
+          >
+            Benutzer
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setActiveTab("company")}
+          className={`flex-1 p-3 items-center justify-center ${
+            activeTab === "company" ? "bg-[#7C5CFC]" : "bg-white"
+          }`}
+        >
+          <Text
+            className={`font-semibold ${
+              activeTab === "company" ? "text-white" : "text-gray-700"
+            }`}
+          >
+            Firma
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View className="flex-row justify-between w-full mb-4 gap-2">
-        <TextInput
-          placeholder="Nachname"
-          className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-        <TextInput
-          placeholder="Vorname"
-          className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-      </View>
-
-      <View className="w-full mb-4">
-        <TextInput
-          placeholder="E-Mail"
-          className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <View className="absolute left-3 top-3">
-          <FontAwesome name="envelope-o" size={20} color="gray" />
-        </View>
-      </View>
-
-      <TextInput
-        placeholder="Adresse"
-        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-        value={address}
-        onChangeText={setAddress}
-      />
-
-      {isCompany && (
+      {/* User Registration Form */}
+      {activeTab === "user" && (
         <>
+          <View className="flex-row justify-between w-full mb-4 gap-2">
+            <TextInput
+              placeholder="Nachname"
+              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+            <TextInput
+              placeholder="Vorname"
+              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
+          </View>
+
+          <View className="w-full mb-4">
+            <TextInput
+              placeholder="E-Mail"
+              className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <View className="absolute left-3 top-3">
+              <FontAwesome name="envelope-o" size={20} color="gray" />
+            </View>
+          </View>
+
+          <TextInput
+            placeholder="Adresse"
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+            value={address}
+            onChangeText={setAddress}
+          />
+
+          <TextInput
+            placeholder="Telefonnummer - WhatsApp"
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+            keyboardType="phone-pad"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
+        </>
+      )}
+
+      {/* Company Registration Form */}
+      {activeTab === "company" && (
+        <>
+          <View className="flex-row justify-between w-full mb-4 gap-2">
+            <TextInput
+              placeholder="Nachname"
+              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+            <TextInput
+              placeholder="Vorname"
+              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
+          </View>
+
+          <View className="w-full mb-4">
+            <TextInput
+              placeholder="E-Mail"
+              className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <View className="absolute left-3 top-3">
+              <FontAwesome name="envelope-o" size={20} color="gray" />
+            </View>
+          </View>
+
+          <TextInput
+            placeholder="Adresse"
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+            value={address}
+            onChangeText={setAddress}
+          />
+
           <TextInput
             placeholder="Steuer ID / Umsatzsteuer ID"
             className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
@@ -156,17 +228,18 @@ const RegisterForm: React.FC = () => {
               />
             )}
           </TouchableOpacity>
+
+          <TextInput
+            placeholder="Telefonnummer - WhatsApp"
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+            keyboardType="phone-pad"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
         </>
       )}
 
-      <TextInput
-        placeholder="Telefonnummer - WhatsApp"
-        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-        keyboardType="phone-pad"
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-      />
-
+      {/* Common Password Fields and Agreement */}
       <TextInput
         placeholder="Passwort"
         className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
@@ -225,13 +298,13 @@ const RegisterForm: React.FC = () => {
           loading ||
           !agbChecked ||
           !privacyChecked ||
-          (isCompany && (!idFrontImage || !idBackImage))
+          (activeTab === "company" && (!idFrontImage || !idBackImage))
         }
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
           loading ||
           !agbChecked ||
           !privacyChecked ||
-          (isCompany && (!idFrontImage || !idBackImage))
+          (activeTab === "company" && (!idFrontImage || !idBackImage))
             ? "disabled"
             : ""
         }`}
