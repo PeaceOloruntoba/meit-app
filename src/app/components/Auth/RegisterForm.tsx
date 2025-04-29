@@ -1,8 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Switch,
+  Image,
+} from "react-native";
 import { useAuth } from "../../hooks/useAuth";
 import { Link } from "expo-router";
 import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 const RegisterForm: React.FC = () => {
   const [lastName, setLastName] = useState("");
@@ -10,52 +18,70 @@ const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [taxId, setTaxId] = useState("");
-  const [idFrontImage, setIdFrontImage] = useState(""); // Placeholder for image upload
-  const [idBackImage, setIdBackImage] = useState(""); // Placeholder for image upload
+  const [idFrontImage, setIdFrontImage] = useState<string | null>(null);
+  const [idBackImage, setIdBackImage] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agbChecked, setAgbChecked] = useState(false);
   const [privacyChecked, setPrivacyChecked] = useState(false);
+  const [isCompany, setIsCompany] = useState(false); // State to track registration type
   const { register, loading, error } = useAuth();
+
+  const pickImage = async (setImageState: (uri: string | null) => void) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to upload images!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setImageState(result.assets[0].uri);
+    }
+  };
 
   const handleRegister = async () => {
     if (!agbChecked || !privacyChecked) {
       console.error("Please accept the terms and privacy policy.");
-      // Set an error state to display to the user
       return;
     }
     if (password !== confirmPassword) {
       console.error("Passwords do not match!");
-      // Set an error state to display to the user
       return;
     }
-    // In a real application, you would likely collect all the form data
     const registrationData = {
       lastName,
       firstName,
       email,
       address,
-      taxId,
-      idFrontImage,
-      idBackImage,
       phoneNumber,
-      // You might not send password directly here depending on your backend
+      ...(isCompany && { taxId, idFrontImage, idBackImage }), // Include company-specific fields
     };
-    await register(email, password, false, registrationData); // Assuming not a company registration here
+    await register(email, password, isCompany, registrationData);
     if (!loading && !error) {
       console.log("Registration successful!");
-      // Potentially navigate the user
     } else if (error) {
       console.error("Registration error:", error);
     }
   };
 
   return (
-    <View className="flex-1 items-center justify-center bg-[#F5F7FA] px-6">
+    <View className="flex-1 items-center bg-white px-6 py-10">
       <Text className="text-3xl font-bold text-black mb-6">
-        Registriere dich!
+        {isCompany ? "Firmenkonto erstellen" : "Benutzerkonto erstellen"}
       </Text>
+
+      <View className="flex-row w-full mb-6 items-center justify-center">
+        <Text className="text-gray-700 mr-2">Als Firma registrieren?</Text>
+        <Switch value={isCompany} onValueChange={setIsCompany} />
+      </View>
 
       <View className="flex-row justify-between w-full mb-4 gap-2">
         <TextInput
@@ -92,32 +118,46 @@ const RegisterForm: React.FC = () => {
         onChangeText={setAddress}
       />
 
-      <TextInput
-        placeholder="Steuer ID / Umsatzsteuer ID"
-        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-        value={taxId}
-        onChangeText={setTaxId}
-      />
+      {isCompany && (
+        <>
+          <TextInput
+            placeholder="Steuer ID / Umsatzsteuer ID"
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+            value={taxId}
+            onChangeText={setTaxId}
+          />
 
-      <TouchableOpacity
-        onPress={() => console.log("Upload ID Front")}
-        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
-      >
-        <Text className="text-gray-500">
-          Bild vom Personalausweis Vorderseite
-        </Text>
-        {idFrontImage ? <Text>{idFrontImage}</Text> : null}
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => pickImage(setIdFrontImage)}
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
+          >
+            <Text className="text-gray-500">
+              Bild vom Personalausweis Vorderseite
+            </Text>
+            {idFrontImage && (
+              <Image
+                source={{ uri: idFrontImage }}
+                style={{ width: 100, height: 75, marginTop: 5 }}
+              />
+            )}
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => console.log("Upload ID Back")}
-        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
-      >
-        <Text className="text-gray-500">
-          Bild vom Personalausweis Rückseite
-        </Text>
-        {idBackImage ? <Text>{idBackImage}</Text> : null}
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => pickImage(setIdBackImage)}
+            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
+          >
+            <Text className="text-gray-500">
+              Bild vom Personalausweis Rückseite
+            </Text>
+            {idBackImage && (
+              <Image
+                source={{ uri: idBackImage }}
+                style={{ width: 100, height: 75, marginTop: 5 }}
+              />
+            )}
+          </TouchableOpacity>
+        </>
+      )}
 
       <TextInput
         placeholder="Telefonnummer - WhatsApp"
@@ -181,9 +221,19 @@ const RegisterForm: React.FC = () => {
 
       <TouchableOpacity
         onPress={handleRegister}
-        disabled={loading || !agbChecked || !privacyChecked}
+        disabled={
+          loading ||
+          !agbChecked ||
+          !privacyChecked ||
+          (isCompany && (!idFrontImage || !idBackImage))
+        }
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
-          loading || !agbChecked || !privacyChecked ? "disabled" : ""
+          loading ||
+          !agbChecked ||
+          !privacyChecked ||
+          (isCompany && (!idFrontImage || !idBackImage))
+            ? "disabled"
+            : ""
         }`}
       >
         <Text className="text-white font-semibold text-base">
