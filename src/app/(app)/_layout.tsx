@@ -45,7 +45,7 @@ const AppLayout = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
-      <Stack />
+      <Stack screenOptions={{ headerShown: false }} />
       <BottomNav items={navigationItems} />
     </SafeAreaView>
   );
