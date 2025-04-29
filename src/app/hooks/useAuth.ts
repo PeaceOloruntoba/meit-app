@@ -105,21 +105,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated: !!isAuthenticated,
-        user,
-        login,
-        register,
-        logout,
-        loading,
-        error,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         isAuthenticated: !!isAuthenticated
+//         user
+//         login
+//         register
+//         logout
+//         loading
+//         error
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
 };
 
 export const useAuth = () => {
