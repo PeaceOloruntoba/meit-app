@@ -56,7 +56,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await signInWithEmailAndPassword(auth, email, password);
       // Navigation will be handled by the auth state listener
     } catch (err: any) {
-      setError(err.message);
+      if (err.code === "auth/user-not-found") {
+        setError("Benutzer mit dieser E-Mail wurde nicht gefunden."); // German translation for user not found
+      } else if (err.code === "auth/invalid-credentials") {
+        setError("Falsches Passwort."); // German translation for wrong password
+      } else {
+        setError(err.message); // Fallback to the generic error message
+      }
     } finally {
       setLoading(false);
     }

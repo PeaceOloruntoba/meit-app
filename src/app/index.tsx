@@ -16,10 +16,10 @@ const SplashScreen = () => {
       if (!loading) {
         if (isAuthenticated) {
           // Redirect authenticated users to the user home page
-          router.replace("/users");
+          router.replace("/(app)/users");
         } else {
           // Redirect unauthenticated users to the default home page with login/signup
-          router.replace("/home");
+          router.replace("/(app)/users");
         }
       }
     }, 3000); // 3-second splash screen
