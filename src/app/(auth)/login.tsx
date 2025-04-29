@@ -1,6 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import LoginForm from "../../components/Auth/LoginForm";
+import LoginForm from "../components/Auth/LoginForm";
 
 const LoginPage = () => {
   return (
