@@ -7,6 +7,7 @@ import {
   User,
 } from "firebase/auth";
 import { useRouter } from "expo-router";
+import { toast } from "sonner-native"; // Import the hook
 
 interface AuthContextType {
   isAuthenticated: boolean | null;
@@ -39,6 +40,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (authUser) {
         setIsAuthenticated(true);
         setUser(authUser);
+        // Simulate role check - in a real app, fetch this from Firestore or auth metadata
+        const userRole = authUser.email?.includes("company")
+          ? "company"
+          : "user";
+
+        if (userRole === "company") {
+          router.replace("/(app)/companies");
+        } else {
+          router.replace("/(app)/users");
+        }
       } else {
         setIsAuthenticated(false);
         setUser(null);
@@ -47,21 +58,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]); // Add router to the dependency array
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Navigation will be handled by the auth state listener
+      toast.success("Login erfolgreich!", {
+        duration: 6000,
+      });
+      // Navigation is handled in the onAuthStateChanged listener
     } catch (err: any) {
       if (err.code === "auth/user-not-found") {
-        setError("Benutzer mit dieser E-Mail wurde nicht gefunden."); // German translation for user not found
-      } else if (err.code === "auth/invalid-credentials") {
-        setError("Falsches Passwort."); // German translation for wrong password
+        setError("Benutzer mit dieser E-Mail wurde nicht gefunden.");
+      } else if (err.code === "auth/invalid-credential") {
+        setError("Falsches Passwort.");
       } else {
-        setError(err.message); // Fallback to the generic error message
+        setError(err.message);
       }
     } finally {
       setLoading(false);
@@ -83,13 +97,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         password
       );
       const newUser = userCredential.user;
-      // You would typically save additional user data to Firestore here
+      const role = isCompany ? "company" : "user";
       console.log(
         "Registration successful for:",
         newUser.email,
-        isCompany,
+        "Role:",
+        role,
         additionalData
       );
+      toast.success("Registrierung erfolgreich!");
       // Navigation will be handled by the auth state listener
     } catch (err: any) {
       setError(err.message);
