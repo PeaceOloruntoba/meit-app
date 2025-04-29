@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "./hooks/useAuth";
 import Colors from "./constants/Colors";
+import { Toaster } from "sonner-native";
 
 const SplashScreen = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const SplashScreen = () => {
           router.replace("/(app)/users");
         } else {
           // Redirect unauthenticated users to the default home page with login/signup
-          router.replace("/(app)/users");
+          router.replace("/home");
         }
       }
     }, 3000); // 3-second splash screen
@@ -30,10 +31,9 @@ const SplashScreen = () => {
   if (splashVisible) {
     return (
       <View className="flex-1 justify-center items-center bg-primary">
-        <Text className="text-white text-3xl font-bold mb-4">
-          Meit App
-        </Text>
+        <Text className="text-white text-3xl font-bold mb-4">Meit App</Text>
         <ActivityIndicator size="large" color={Colors.primary} />
+        <Toaster richColors />
       </View>
     );
   }
