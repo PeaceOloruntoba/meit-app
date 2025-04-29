@@ -35,8 +35,8 @@ const AppLayout = () => {
     { href: "/notifications", label: "Notifications" },
   ];
 
-  const isAdmin = false;
-  const isCompanyUser = true;
+  const isAdmin = true;
+  const isCompanyUser = false;
   const navigationItems = isAdmin
     ? companyNavigationItems
     : isCompanyUser
@@ -44,11 +44,11 @@ const AppLayout = () => {
     : userNavigationItems;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
+    <SafeAreaView className="bg-black" style={{ flex: 1, backgroundColor: Colors.background }}>
       <Stack screenOptions={{ headerShown: false }} />
       <BottomNav items={navigationItems} />
     </SafeAreaView>
   );
 };
 
-export default AppLayout; // <----- Make sure this line is present and correct
+export default AppLayout;
