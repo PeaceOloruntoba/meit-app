@@ -15,6 +15,16 @@
       ]
     ],
     "name": "meit-app",
-    "slug": "meit-app"
+    "slug": "meit-app",
+    "extra": {
+      "primaryColor": "#7D7AFF",
+      "secondaryColor": "#1E20241A",
+      "backgroundColor": "#F2F5FA",
+      "textPrimaryColor": "#000000",
+      "textSecondaryColor": "#838D95",
+      "successColor": "#28a745",
+      "errorColor": "#dc3545",
+      "warningColor": "#ffc107"
+    }
   }
 }
