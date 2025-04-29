@@ -1,16 +1,16 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { auth } from "../utils/firebaseConfig";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
+  User,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { Redirect, useRouter } from "expo-router";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: any | null; // Replace 'any' with your user type if you have one
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
@@ -25,61 +25,36 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // Initialize as null
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const db = getFirestore(auth?.app); // Use optional chaining in case auth is null
+  const router = useRouter();
 
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
-    if (auth) {
-      unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-        if (authUser) {
-          const userDocRef = doc(db, authUser.uid);
-          try {
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists()) {
-              setUser({ uid: authUser.uid, ...userDocSnap.data() });
-              setIsAuthenticated(true);
-            } else {
-              setUser({ uid: authUser.uid, email: authUser.email });
-              setIsAuthenticated(true);
-            }
-          } catch (e: any) {
-            console.error("Error fetching user data:", e.message);
-            setError("Failed to fetch user data.");
-          } finally {
-            setLoading(false);
-          }
-        } else {
-          setUser(null);
-          setIsAuthenticated(false);
-          setLoading(false);
-        }
-      });
-    } else {
-      console.warn("Firebase Auth not initialized.");
-      setLoading(false);
-    }
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        setIsAuthenticated(true);
+        setUser(authUser);
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
       }
-    };
-  }, [db, auth]); // Add db and auth to the dependency array
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
-      if (auth) {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        setError("Authentication not initialized.");
-      }
+      await signInWithEmailAndPassword(auth, email, password);
+      // Navigation will be handled by the auth state listener
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -91,34 +66,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: string,
     password: string,
     isCompany: boolean,
-    additionalData: any = {}
+    additionalData?: any
   ) => {
     setLoading(true);
     setError(null);
     try {
-      if (auth) {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const newUser = userCredential.user;
-        const userDocRef = doc(db, newUser.uid);
-        const userData = {
-          email: newUser.email,
-          isCompany: isCompany,
-          ...additionalData,
-        };
-        await setDoc(userDocRef, userData);
-        setUser({ uid: newUser.uid, ...userData });
-        setIsAuthenticated(true);
-      } else {
-        setError("Authentication not initialized.");
-      }
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const newUser = userCredential.user;
+      // You would typically save additional user data to Firestore here
+      console.log(
+        "Registration successful for:",
+        newUser.email,
+        isCompany,
+        additionalData
+      );
+      // Navigation will be handled by the auth state listener
     } catch (err: any) {
       setError(err.message);
-      setIsAuthenticated(false);
-      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -128,13 +96,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      if (auth) {
-        await signOut(auth);
-        setUser(null);
-        setIsAuthenticated(false);
-      } else {
-        setError("Authentication not initialized.");
-      }
+      await signOut(auth);
+      router.replace("/(auth)/login");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -142,13 +105,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-//   return (
-//     <AuthContext.Provider
-//       value={{ isAuthenticated, user, login, register, logout, loading, error }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   );
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated: !!isAuthenticated,
+        user,
+        login,
+        register,
+        logout,
+        loading,
+        error,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
@@ -158,3 +129,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthProvider;

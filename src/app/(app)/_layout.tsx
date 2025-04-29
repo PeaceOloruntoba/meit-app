@@ -1,5 +1,5 @@
 import { Stack, Redirect } from "expo-router";
-import { SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, View, Text } from "react-native";
 import BottomNav from "../components/UI/BottomNav";
 import { useAuth } from "../hooks/useAuth";
 import Colors from "../constants/Colors";
@@ -8,7 +8,6 @@ const AppLayout = () => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    // You can render a loading indicator here
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <Text>Loading...</Text>
@@ -36,9 +35,8 @@ const AppLayout = () => {
     { href: "/notifications", label: "Notifications" },
   ];
 
-  // Determine which BottomNav items to show based on user role (you'll need to implement this in your useAuth hook or context)
-  const isAdmin = false; // Placeholder for admin check
-  const isCompanyUser = true; // Placeholder for company user check
+  const isAdmin = false;
+  const isCompanyUser = true;
   const navigationItems = isAdmin
     ? companyNavigationItems
     : isCompanyUser
@@ -53,4 +51,4 @@ const AppLayout = () => {
   );
 };
 
-export default AppLayout;
+export default AppLayout; // <----- Make sure this line is present and correct
