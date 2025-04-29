@@ -1,13 +1,30 @@
-import { Stack, Redirect } from "expo-router";
+import { Stack, Redirect, useRouter, usePathname } from "expo-router";
 import { SafeAreaView, View, Text } from "react-native";
 import BottomNav from "../components/UI/BottomNav";
 import { useAuth } from "../hooks/useAuth";
 import Colors from "../constants/Colors";
+import { useEffect, useState } from "react";
+import { auth } from "../utils/firebaseConfig"; // Import auth for user info
 
 const AppLayout = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
+  const [isCompanyUser, setIsCompanyUser] = useState<boolean | null>(null);
+  const router = useRouter();
+  const pathname = usePathname(); // Get the current path
 
-  if (loading) {
+  useEffect(() => {
+    const determineUserRole = async () => {
+      if (user) {
+        setIsCompanyUser(user.email?.includes("company") || false);
+      } else {
+        setIsCompanyUser(null);
+      }
+    };
+
+    determineUserRole();
+  }, [user]);
+
+  if (loading || isCompanyUser === null) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <Text>Loading...</Text>
@@ -19,32 +36,48 @@ const AppLayout = () => {
     return <Redirect href="/(auth)/login" />;
   }
 
+  // Conditional Routing
+  useEffect(() => {
+    if (isAuthenticated && isCompanyUser) {
+      if (!pathname?.startsWith("/companies")) {
+        router.replace("/companies");
+      }
+    } else if (isAuthenticated && !isCompanyUser) {
+      if (!pathname?.startsWith("/users")) {
+        router.replace("/users");
+      }
+    }
+  }, [isAuthenticated, isCompanyUser, pathname, router]);
+
   const userNavigationItems = [
-    { href: "/users", label: "Home" },
-    { href: "/users/search", label: "Search" },
-    { href: "/users/booking", label: "Bookings" },
-    { href: "/users/profile", label: "Profile" },
-    { href: "/notifications", label: "Notifications" },
+    { href: "/users", label: "Home", icon: <Text>🏠</Text> }, // Example icon
+    { href: "/users/search", label: "Search", icon: <Text>🔍</Text> },
+    { href: "/users/booking", label: "Bookings", icon: <Text>🗓️</Text> },
+    { href: "/users/profile", label: "Profile", icon: <Text>👤</Text> },
+    { href: "/notifications", label: "Notifications", icon: <Text>🔔</Text> },
   ];
 
   const companyNavigationItems = [
-    { href: "/companies", label: "Dashboard" },
-    { href: "/companies/products/list", label: "Products" },
-    { href: "/companies/rentals", label: "Rentals" },
-    { href: "/companies/profile", label: "Profile" },
-    { href: "/notifications", label: "Notifications" },
+    { href: "/companies", label: "Dashboard", icon: <Text>📊</Text> },
+    {
+      href: "/companies/products/list",
+      label: "Products",
+      icon: <Text>📦</Text>,
+    },
+    { href: "/companies/rentals", label: "Rentals", icon: <Text>🔄</Text> },
+    { href: "/companies/profile", label: "Profile", icon: <Text>👤</Text> },
+    { href: "/notifications", label: "Notifications", icon: <Text>🔔</Text> },
   ];
 
-  const isAdmin = true;
-  const isCompanyUser = false;
-  const navigationItems = isAdmin
-    ? companyNavigationItems
-    : isCompanyUser
+  const navigationItems = isCompanyUser
     ? companyNavigationItems
     : userNavigationItems;
 
   return (
-    <SafeAreaView className="bg-black" style={{ flex: 1, backgroundColor: Colors.background }}>
+    <SafeAreaView
+      className="bg-black"
+      style={{ flex: 1, backgroundColor: Colors.background }}
+    >
       <Stack screenOptions={{ headerShown: false }} />
       <BottomNav items={navigationItems} />
     </SafeAreaView>
