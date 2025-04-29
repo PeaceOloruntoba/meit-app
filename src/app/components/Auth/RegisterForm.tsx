@@ -52,7 +52,7 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 items-center bg-white px-6 py-10">
+    <View className="flex-1 items-center justify-center bg-[#F5F7FA] px-6">
       <Text className="text-3xl font-bold text-black mb-6">
         Registriere dich!
       </Text>
@@ -60,13 +60,13 @@ const RegisterForm: React.FC = () => {
       <View className="flex-row justify-between w-full mb-4 gap-2">
         <TextInput
           placeholder="Nachname"
-          className="flex-1 p-3 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+          className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
           value={lastName}
           onChangeText={setLastName}
         />
         <TextInput
           placeholder="Vorname"
-          className="flex-1 p-3 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+          className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
           value={firstName}
           onChangeText={setFirstName}
         />
@@ -75,7 +75,7 @@ const RegisterForm: React.FC = () => {
       <View className="w-full mb-4">
         <TextInput
           placeholder="E-Mail"
-          className="w-full p-3 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+          className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
@@ -87,21 +87,21 @@ const RegisterForm: React.FC = () => {
 
       <TextInput
         placeholder="Adresse"
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
         value={address}
         onChangeText={setAddress}
       />
 
       <TextInput
         placeholder="Steuer ID / Umsatzsteuer ID"
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
         value={taxId}
         onChangeText={setTaxId}
       />
 
       <TouchableOpacity
         onPress={() => console.log("Upload ID Front")}
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm items-start justify-center"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
       >
         <Text className="text-gray-500">
           Bild vom Personalausweis Vorderseite
@@ -111,7 +111,7 @@ const RegisterForm: React.FC = () => {
 
       <TouchableOpacity
         onPress={() => console.log("Upload ID Back")}
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm items-start justify-center"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
       >
         <Text className="text-gray-500">
           Bild vom Personalausweis Rückseite
@@ -121,7 +121,7 @@ const RegisterForm: React.FC = () => {
 
       <TextInput
         placeholder="Telefonnummer - WhatsApp"
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
         keyboardType="phone-pad"
         value={phoneNumber}
         onChangeText={setPhoneNumber}
@@ -129,7 +129,7 @@ const RegisterForm: React.FC = () => {
 
       <TextInput
         placeholder="Passwort"
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -137,7 +137,7 @@ const RegisterForm: React.FC = () => {
 
       <TextInput
         placeholder="Passwort wiederholen"
-        className="w-full p-3 mb-4 rounded-xl bg-[#F5F7FA] text-gray-700 shadow-sm"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
@@ -146,7 +146,7 @@ const RegisterForm: React.FC = () => {
       <View className="flex-row w-full mb-6 gap-2">
         <TouchableOpacity
           onPress={() => setAgbChecked(!agbChecked)}
-          className={`flex-1 flex-row items-center p-3 rounded-xl bg-[#F5F7FA] ${
+          className={`flex-1 flex-row items-center p-3 rounded-xl bg-white ${
             agbChecked ? "border-[#7C5CFC] border-2" : ""
           }`}
         >
@@ -162,7 +162,7 @@ const RegisterForm: React.FC = () => {
 
         <TouchableOpacity
           onPress={() => setPrivacyChecked(!privacyChecked)}
-          className={`flex-1 flex-row items-center p-3 rounded-xl bg-[#F5F7FA] ${
+          className={`flex-1 flex-row items-center p-3 rounded-xl bg-white ${
             privacyChecked ? "border-[#7C5CFC] border-2" : ""
           }`}
         >
@@ -183,7 +183,7 @@ const RegisterForm: React.FC = () => {
         onPress={handleRegister}
         disabled={loading || !agbChecked || !privacyChecked}
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
-          loading || !agbChecked || !privacyChecked ? "opacity-50" : ""
+          loading || !agbChecked || !privacyChecked ? "disabled" : ""
         }`}
       >
         <Text className="text-white font-semibold text-base">
