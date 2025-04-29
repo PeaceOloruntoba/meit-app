@@ -5,7 +5,7 @@ import Colors from "../constants/Colors";
 const AuthLayout = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
-      <Stack />
+      <Stack screenOptions={{ headerShown: false }} />
     </SafeAreaView>
   );
 };
