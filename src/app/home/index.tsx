@@ -4,7 +4,7 @@ import { View, Text } from "react-native";
 
 const HomePage = () => {
   return (
-    <View className="flex-1 justify-center items-center bg-white p-6">
+    <View className="flex-1 justify-center items-center bg-background p-6">
       <Text className="text-2xl font-bold mb-8 text-center">
         Welcome to Our Rental App!
       </Text>
