@@ -32,18 +32,30 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <TouchableOpacity
       onPress={() => router.navigate(`/companies/products/${id}`)}
-      className="bg-white rounded-md overflow-hidden mb-4 shadow-md"
+      className="bg-white rounded-md mb-4 shadow-md flex flex-row"
     >
-      {imageUrl ? (
-        <Image
-          source={{ uri: imageUrl }}
-          className="w-full h-36 object-cover"
-        />
-      ) : (
-        <View className="w-full h-36 bg-gray-100 justify-center items-center">
-          <Text className="text-gray-500">No Image</Text>
-        </View>
-      )}
+      <View className="relative">
+        {imageUrl ? (
+          <>
+            <Image
+              source={{ uri: imageUrl }}
+              className="object-cover"
+            />
+            <View className="flex-row items-center mt-1 absolute inset-1 bottom-0 right-0">
+              <Ionicons
+                name="location-sharp"
+                size={14}
+                color={Colors.secondary}
+              />
+              <Text className="text-xs text-gray-600 ml-1">{distance}</Text>
+            </View>{" "}
+          </>
+        ) : (
+          <View className="w-36 h-36 bg-gray-100 justify-center items-center">
+            <Text className="text-gray-500">No Image</Text>
+          </View>
+        )}
+      </View>
       <View className="p-4">
         <Text className="text-lg font-bold mb-1 text-black">{name}</Text>
         {deposit !== undefined && (
@@ -79,7 +91,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
         {distance && (
           <View className="flex-row items-center mt-1">
-            <Ionicons name="location-sharp" size={14} color={Colors.secondary} />
+            <Ionicons
+              name="location-sharp"
+              size={14}
+              color={Colors.secondary}
+            />
             <Text className="text-xs text-gray-600 ml-1">{distance}</Text>
           </View>
         )}
