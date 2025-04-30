@@ -31,7 +31,7 @@ const MyProductsPage = () => {
   }
 
   return (
-    <View className="flex-1 bg-primary p-4 pt-20">
+    <View className="flex-1 bg-[#F2F5FA] p-4 pt-20">
       <View className="flex-row justify-end mb-4">
         <Link href="/add-product" className="bg-black rounded-md p-3">
           <Feather name="plus" size={24} color="white" />

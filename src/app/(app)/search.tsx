@@ -59,7 +59,7 @@ const SearchScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-gray-100 p-4 pt-20">
+    <View className="flex-1 bg-[#F2F5FA] p-4 pt-20">
       <View className="bg-white rounded-md mb-4 p-2 flex-row items-center border border-gray-300">
         <Feather name="search" size={20} color="#888" className="mr-2" />
         <TextInput

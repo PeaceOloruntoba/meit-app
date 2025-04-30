@@ -74,7 +74,7 @@ const EditProfilePage = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-100 p-6">
+    <View className="flex-1 bg-[#F2F5FA] p-6">
       <TouchableOpacity onPress={() => router.back()} className="mb-4">
         <Feather name="arrow-left" size={24} color="#374151" />
       </TouchableOpacity>

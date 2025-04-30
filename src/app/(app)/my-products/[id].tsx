@@ -41,15 +41,14 @@ const ProductDetailsPage = () => {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white p-4">
+    <ScrollView className="flex-1 bg-[#F2F5FA] p-4 pt-20">
       <TouchableOpacity
         onPress={() => router.back()}
-        className="absolute top-6 right-4 bg-black rounded-full p-2 z-10"
+        className="absolute top-6 right-4 bg-black rounded-md p-2 z-10"
       >
         <Text className="text-white text-lg">X</Text>
       </TouchableOpacity>
       <Text className="text-2xl font-bold mb-2">{product.name}</Text>
-      {/* Seller Name - You might need to fetch this based on product.userId */}
       <Text className="text-gray-600 mb-4">
         Verkäufer: {/* Seller's Name */}
       </Text>
