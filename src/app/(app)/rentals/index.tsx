@@ -62,9 +62,9 @@ const RentalItem = ({ rental }: { rental: (typeof dummyRentals)[0] }) => {
 
 const RentalsPage = () => {
   return (
-    <View className="flex-1 bg-[#F2F5FA] p-4">
+    <View className="flex-1 bg-[#F2F5FA] p-4 pt-20">
       <Text className="text-2xl font-bold mb-4 text-text">
-        Available Rentals in Agege, Nigeria
+        Available Rentals in Your inbox
       </Text>
       <FlatList
         data={dummyRentals}

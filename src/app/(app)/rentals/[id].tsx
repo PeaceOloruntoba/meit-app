@@ -79,7 +79,7 @@ const RentalDetailsPage = () => {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background p-4">
+    <ScrollView className="flex-1 bg-[#F2F5FA] p-4 pt-20">
       <TouchableOpacity onPress={() => router.back()} className="mb-4">
         <Text className="text-blue-500">&larr; Back to Rentals</Text>
       </TouchableOpacity>
