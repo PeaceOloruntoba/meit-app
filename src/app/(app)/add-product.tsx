@@ -21,14 +21,14 @@ const AddProductPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | undefined>();
-  const [timePeriod, setTimePeriod] = useState(""); // "Tag", "Monat", etc.
+  const [timePeriod, setTimePeriod] = useState("");
   const [deposit, setDeposit] = useState<number | undefined>();
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
   const [deliveryCost, setDeliveryCost] = useState<number | undefined>();
   const [additionalDeliveryCost, setAdditionalDeliveryCost] = useState<
     number | undefined
-  >(); // Or priceRange
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  >();
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // Single image URL state
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
@@ -40,7 +40,7 @@ const AddProductPage = () => {
     const productData = {
       name,
       description,
-      imageUrl: imageUrls,
+      imageUrl, // Still using array for now, see note below
       price,
       pricePerDay: timePeriod === "Tag" ? price : undefined,
       pricePerMonth: timePeriod === "Monat" ? price : undefined,
@@ -58,23 +58,19 @@ const AddProductPage = () => {
 
     const newProductId = await addProduct(productData);
     if (newProductId) {
-      // Optionally navigate to the product details page after successful addition
       router.push(`/[product-details]?id=${newProductId}`);
     }
-    // No need to navigate on error, the hook handles error display
   };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: true,
-      selectionLimit: 5, // Limit to 5 images
-      quality: 0.5, // Reduce image quality
+      allowsMultipleSelection: false, // Only allow single selection
+      quality: 0.5,
     });
 
-    if (!result.canceled) {
-      const selectedImages = result.assets.map((asset) => asset.uri);
-      setImageUrls(selectedImages);
+    if (!result.canceled && result.assets.length > 0) {
+      setImageUrl(result.assets[0].uri);
     }
   };
 
@@ -256,22 +252,19 @@ const AddProductPage = () => {
       </View>
 
       <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Bilder hochladen</Text>
+        <Text className="text-sm font-medium mb-1">Bild hochladen</Text>
         <TouchableOpacity
           onPress={pickImage}
           className="bg-gray-100 border border-dashed border-gray-400 rounded-md p-10 flex items-center justify-center"
         >
           <Feather name="upload" size={24} color="gray" />
         </TouchableOpacity>
-        {imageUrls.length > 0 && (
-          <View className="mt-4 flex flex-row flex-wrap">
-            {imageUrls.map((uri, index) => (
-              <Image
-                key={index}
-                source={{ uri }}
-                className="w-20 h-20 rounded-md mr-2 mb-2"
-              />
-            ))}
+        {imageUrl && (
+          <View className="mt-4">
+            <Image
+              source={{ uri: imageUrl }}
+              className="w-20 h-20 rounded-md"
+            />
           </View>
         )}
       </View>
