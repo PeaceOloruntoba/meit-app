@@ -28,7 +28,7 @@ const AppLayout = () => {
     {
       href: "/my-products",
       label: "My Products",
-      icon: <Feather name="list" size={24} color={Colors.primary} />,
+      icon: <Feather name="grid" size={24} color={Colors.primary} />,
     },
     {
       href: "/search",
@@ -38,7 +38,7 @@ const AppLayout = () => {
     {
       href: "/rentals",
       label: "Rentals",
-      icon: <Feather name="swap-horizontal" size={24} color={Colors.primary} />,
+      icon: <Feather name="list" size={24} color={Colors.primary} />,
     },
     {
       href: "/profile",
