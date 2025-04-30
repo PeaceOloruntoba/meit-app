@@ -48,7 +48,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 color={Colors.secondary}
               />
               <Text className="text-xs text-gray-600 ml-1">{distance}</Text>
-            </View>{" "}
+            </View>
           </>
         ) : (
           <View className="w-36 h-36 bg-gray-100 justify-center items-center">
