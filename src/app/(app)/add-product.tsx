@@ -40,14 +40,34 @@ const AddProductPage = () => {
   const [contactWhatsApp, setContactWhatsApp] = useState<string>("");
   const [location, setLocation] = useState<string>("");
 
+  interface Product {
+    id: string;
+    name: string;
+    description?: string;
+    imageUrls?: string[];
+    price?: number;
+    pricePerDay?: number;
+    pricePerMonth?: number;
+    deposit?: number;
+    deliveryAvailable?: boolean;
+    deliveryCost?: number;
+    additionalDeliveryCost?: number;
+    startDate?: string;
+    endDate?: string;
+    contactEmail?: string;
+    contactWebsite?: string;
+    contactWhatsApp?: string;
+    location?: string;
+    userId: string;
+  }
+
   const handleAddProduct = async () => {
-    const productData = {
+    const productData: { [key: string]: any } = {
+      // Use a flexible type for productData
       name,
       description,
       imageUrl,
       price,
-      pricePerDay: timePeriod === "Tag" ? price : undefined,
-      pricePerMonth: timePeriod === "Monat" ? price : undefined,
       deposit,
       deliveryAvailable,
       deliveryCost,
@@ -60,13 +80,19 @@ const AddProductPage = () => {
       location,
     };
 
-    const newProductId = await addProduct(productData);
+    if (timePeriod === "Tag" && price !== undefined) {
+      productData.pricePerDay = price;
+    } else if (timePeriod === "Monat" && price !== undefined) {
+      productData.pricePerMonth = price;
+    }
+
+    const newProductId = await addProduct(
+      productData as Omit<Product, "id" | "userId">
+    );
     if (newProductId) {
       router.push(`/my-products/[id]?id=${newProductId}`);
     } else if (error) {
-      // You can display the error message to the user here
       console.error("Error adding product:", error);
-      // Optionally, set a local error state to show in the UI
     }
   };
 
@@ -337,6 +363,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: Colors.secondary,
+    backgroundColor: "#fff",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -344,11 +371,13 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 100,
     textAlignVertical: "top",
+    backgroundColor: "#fff",
   },
   picker: {
     borderWidth: 1,
     borderColor: Colors.secondary,
     borderRadius: 8,
+    backgroundColor: "#fff",
   },
   deliveryToggle: {
     flexDirection: "row",
@@ -356,6 +385,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     borderWidth: 1,
+    backgroundColor: "#fff",
   },
   deliveryActive: {
     backgroundColor: "#e6ffe6",
