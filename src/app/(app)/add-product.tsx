@@ -61,7 +61,7 @@ const AddProductPage = () => {
 
     const newProductId = await addProduct(productData);
     if (newProductId) {
-      router.push(`/[product-details]?id=${newProductId}`);
+      router.push(`/my-products/[id]?id=${newProductId}`);
     } else if (error) {
       // You can display the error message to the user here
       console.error("Error adding product:", error);
