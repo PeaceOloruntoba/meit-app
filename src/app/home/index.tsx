@@ -14,7 +14,7 @@ const HomePage = () => {
       <View className="flex-row gap-4">
         <Link
           href="/(auth)/login"
-          className="bg-primary text-white py-2 px-6 rounded-md font-semibold"
+          className="bg-primary text-black py-2 px-6 rounded-md font-semibold"
         >
           Log In
         </Link>
