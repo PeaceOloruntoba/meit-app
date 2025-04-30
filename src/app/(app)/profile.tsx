@@ -35,51 +35,53 @@ const ProfilePage = () => {
   }
 
   return (
-    <View className="flex-1 bg-gray-100 py-5">
-      <TouchableOpacity
-        onPress={() => router.push("/edit-profile")}
-        style={styles.listItem}
-      >
-        <Text className="text-lg text-gray-800">Profil bearbeiten</Text>
-        <Feather name="chevron-right" size={20} color="#888" />
-      </TouchableOpacity>
+    <View className="flex-1 bg-gray-100 p-4 pt-20 flex-col justify-between">
+      <View>
+        <TouchableOpacity
+          onPress={() => router.push("/edit-profile")}
+          style={styles.listItem}
+        >
+          <Text className="text-lg text-gray-800">Profil bearbeiten</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => {
-          /* Handle Impressum navigation */
-        }}
-        style={styles.listItem}
-      >
-        <Text className="text-lg text-gray-800">Impressum</Text>
-        <Feather name="chevron-right" size={20} color="#888" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle Impressum navigation */
+          }}
+          style={styles.listItem}
+        >
+          <Text className="text-lg text-gray-800">Impressum</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => {
-          /* Handle Rechtliches navigation */
-        }}
-        style={styles.listItem}
-      >
-        <Text className="text-lg text-gray-800">Rechtliches</Text>
-        <Feather name="chevron-right" size={20} color="#888" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle Rechtliches navigation */
+          }}
+          style={styles.listItem}
+        >
+          <Text className="text-lg text-gray-800">Rechtliches</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
+      </View>
 
-      <View className="my-3 border-b border-gray-300" />
+      <View>
+        <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+          <Text className="text-lg text-red-600">Abmelden</Text>
+          <Feather name="chevron-right" size={20} color="#d32f2f" />
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-        <Text className="text-lg text-white">Abmelden</Text>
-        <Feather name="chevron-right" size={20} color="#fff" />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          /* Handle Account löschen */
-        }}
-        style={styles.deleteAccountButton}
-      >
-        <Text className="text-lg text-white">Account löschen</Text>
-        <Feather name="chevron-right" size={20} color="#fff" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle Account löschen */
+          }}
+          style={styles.deleteAccountButton}
+        >
+          <Text className="text-lg text-white">Account löschen</Text>
+          <Feather name="chevron-right" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -100,8 +102,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: "#f44336",
-    marginBottom: 1,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#d32f2f",
+    marginBottom: 6,
+    borderRadius: 10,
   },
   deleteAccountButton: {
     flexDirection: "row",
@@ -110,6 +115,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     backgroundColor: "#d32f2f",
+    marginTop: 12,
   },
 });
 
