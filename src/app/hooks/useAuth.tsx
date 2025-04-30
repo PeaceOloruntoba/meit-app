@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   User,
+  updateProfile, // Import updateProfile
 } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { toast } from "sonner-native"; // Import the hook
@@ -17,6 +18,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   loading: boolean;
   error: string | null;
+  updateUserProfile: (displayName?: string | null) => Promise<void>; // Add updateProfile function
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,6 +97,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const updateUserProfile = async (displayName?: string | null) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (auth.currentUser && displayName !== undefined) {
+        await updateProfile(auth.currentUser, {
+          displayName: displayName,
+        });
+        // Update the local user state
+        setUser({ ...auth.currentUser, displayName });
+        toast.success("Profil erfolgreich aktualisiert!");
+      }
+    } catch (err: any) {
+      setError(err.message);
+      toast.error("Fehler beim Aktualisieren des Profils.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -105,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         loading,
         error,
+        updateUserProfile, // Include the new function in the context
       }}
     >
       {children}
