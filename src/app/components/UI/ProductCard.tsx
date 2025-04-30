@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <TouchableOpacity
-      onPress={() => router.navigate(`/companies/products/${id}`)}
+      onPress={() => router.navigate(`/my-products/${id}`)}
       className="bg-white rounded-md mb-4 shadow-md flex flex-row"
     >
       <View className="relative">
