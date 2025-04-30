@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
       if (authUser) {
         await fetchAdditionalUserData(authUser.uid);
-        router.replace("/(app)");
+        router.replace("/(app)/my-products/index");
       } else {
         setAdditionalUserData(null);
         router.replace("/(auth)/login");
