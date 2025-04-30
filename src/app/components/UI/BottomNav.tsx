@@ -23,14 +23,23 @@ const BottomNav: React.FC<BottomNavProps> = ({ items }) => {
         <TouchableOpacity
           key={item.href}
           onPress={() => router.push(item.href)}
-          className={`flex-1 items-center py-2 ${
-            pathname === item.href ? "" : ""
-          }`}
+          className={`flex-1 items-center py-2`}
         >
-          {item.icon && <View className="mb-1">{item.icon}</View>}
+          {item.icon && (
+            <View className="mb-1">
+              {React.cloneElement(item.icon as React.ReactElement, {
+                color:
+                  pathname === item.href
+                    ? Colors.primary
+                    : Colors.textSecondary,
+              })}
+            </View>
+          )}
           <Text
-            className={`text-xs text-gray-500 ${
-              pathname === item.href ? "text-primary font-semibold" : ""
+            className={`text-xs ${
+              pathname === item.href
+                ? "text-primary font-semibold"
+                : "text-textSecondary"
             }`}
           >
             {item.label}

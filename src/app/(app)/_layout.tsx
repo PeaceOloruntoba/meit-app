@@ -4,7 +4,7 @@ import BottomNav from "../components/UI/BottomNav";
 import { useAuth } from "../hooks/useAuth";
 import Colors from "../constants/Colors";
 import { useEffect } from "react";
-import { Ionicons, Feather } from "@expo/vector-icons"; // Example icons
+import { Ionicons, Feather } from "@expo/vector-icons";
 
 const AppLayout = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -13,7 +13,7 @@ const AppLayout = () => {
 
   useEffect(() => {
     if (loading) {
-      return; // Don't redirect while loading
+      return;
     }
     if (!isAuthenticated) {
       router.replace("/(auth)/login");
@@ -21,7 +21,7 @@ const AppLayout = () => {
   }, [isAuthenticated, loading, router]);
 
   if (!isAuthenticated && !loading) {
-    return null; // Or a loading spinner if you prefer
+    return null;
   }
 
   const navigationItems = [
@@ -49,33 +49,16 @@ const AppLayout = () => {
 
   return (
     <SafeAreaView
-      className="flex-1 bg-black"
+      className="flex-1"
       style={{ backgroundColor: Colors.background }}
     >
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />{" "}
-        {/* Optional: If you have a default screen in (app) */}
-        <Stack.Screen
-          name="my-products/index"
-          options={{ headerShown: true, headerTitle: "Meine Produkte" }}
-        />
-        <Stack.Screen
-          name="search"
-          options={{ headerShown: true, headerTitle: "Suche" }}
-        />
-        <Stack.Screen
-          name="rentals/index"
-          options={{ headerShown: true, headerTitle: "Meine Mietvorgänge" }}
-        />
-        <Stack.Screen
-          name="profile"
-          options={{ headerShown: true, headerTitle: "Profil" }}
-        />
-        <Stack.Screen
-          name="[product-details]"
-          options={{ headerShown: true, headerTitle: "Produkt Details" }}
-        />{" "}
-        {/* Example dynamic route */}
+        <Stack.Screen name="my-products/index" />
+        <Stack.Screen name="add-product" />
+        <Stack.Screen name="[product-details]" />
+        <Stack.Screen name="search" />
+        <Stack.Screen name="rentals/index" />
+        {/* Other Stack Screens */}
       </Stack>
       <BottomNav items={navigationItems} />
     </SafeAreaView>
