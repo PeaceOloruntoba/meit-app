@@ -1,0 +1,18 @@
+HTML
+
+
+<div class="chatbot-toggle" onclick="toggleChatbot()">
+        <i class="fas fa-comment-alt"></i>
+    </div>
+    
+    <div class="chatbot-container" id="chatbot-container">
+        <div class="chatbot-header">
+            <h3>INTECU AI</h3>
+            <button onclick="toggleChatbot()">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <form id="chatbot-form">
+            <input type="text" id="chat-input" placeholder="Ask me anything..." required />
+            <button type="submit">➤</button>
+        </form>
+    </div>
