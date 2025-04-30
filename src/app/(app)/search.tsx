@@ -12,7 +12,7 @@ import useProduct from "../hooks/useProduct";
 import ProductCard from "../components/UI/ProductCard";
 
 const SearchScreen = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("a");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const { products, getAllProducts, loading, error } = useProduct();
 
@@ -28,13 +28,13 @@ const SearchScreen = () => {
     if (products) {
       const results = products.filter(
         (product) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.name.toLowerCase().includes(searchTerm?.toLowerCase()) ||
           (product.description &&
             product.description
               .toLowerCase()
-              .includes(searchTerm.toLowerCase())) ||
+              .includes(searchTerm?.toLowerCase())) ||
           (product.location &&
-            product.location.toLowerCase().includes(searchTerm.toLowerCase()))
+            product.location.toLowerCase().includes(searchTerm?.toLowerCase()))
       );
       setFilteredProducts(results);
     }

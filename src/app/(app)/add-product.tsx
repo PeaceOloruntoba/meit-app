@@ -72,9 +72,9 @@ const AddProductPage = () => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ["images", "videos"],
       allowsMultipleSelection: false,
-      quality: 0.5,
+      quality: 1,
     });
 
     if (!result.canceled && result.assets.length > 0) {

@@ -66,9 +66,9 @@ const ProductDetailsPage = () => {
       )}
 
       <Text className="text-lg font-semibold mb-2">Daten</Text>
-      {product.pricePerDay !== undefined && (
+      {product.price !== undefined && (
         <Text className="text-gray-600 mb-1">
-          Preis: {product.pricePerDay.toFixed(2)} € pro Tag
+          Preis: {product.price.toFixed(2)} € pro Tag
         </Text>
       )}
       {product.deliveryCost !== undefined && (

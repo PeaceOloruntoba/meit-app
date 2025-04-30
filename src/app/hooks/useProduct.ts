@@ -18,10 +18,8 @@ interface Product {
   id: string;
   name: string;
   description?: string;
-  imageUrls?: string[]; // Support multiple images
+  imageUrls?: string[];
   price?: number;
-  pricePerDay?: number;
-  pricePerMonth?: number;
   deposit?: number;
   deliveryAvailable?: boolean;
   deliveryCost?: number;
