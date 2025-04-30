@@ -16,7 +16,7 @@ import { useAuth } from "./useAuth";
 import { toast } from "sonner-native";
 
 interface Product {
-  id?: string;
+  id: string;
   name: string; // You'll need a field for the product name
   description?: string;
   imageUrl?: string[]; // Allow multiple images
