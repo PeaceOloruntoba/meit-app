@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker"; // For the "zeitraum" dropdown
 import { Feather } from "@expo/vector-icons"; // For icons
