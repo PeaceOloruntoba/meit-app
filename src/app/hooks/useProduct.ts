@@ -19,7 +19,7 @@ interface Product {
   id: string;
   name: string; // You'll need a field for the product name
   description?: string;
-  imageUrl?: string[]; // Allow multiple images
+  imageUrl?: string; // Allow multiple images
   price?: number; // General price, might be linked to Zeitraum
   pricePerDay?: number; // Specific price per day
   pricePerMonth?: number; // Specific price per month (if applicable)
