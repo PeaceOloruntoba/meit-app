@@ -13,12 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean | null;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (
-    email: string,
-    password: string,
-    isCompany: boolean,
-    additionalData?: any
-  ) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>; // Removed isCompany
   logout: () => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -37,24 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      if (authUser) {
-        setIsAuthenticated(true);
-        setUser(authUser);
-        // Simulate role check - in a real app, fetch this from Firestore or auth metadata
-        const userRole = authUser.email?.includes("company")
-          ? "company"
-          : "user";
-
-        if (userRole === "company") {
-          router.replace("/(app)/companies");
-        } else {
-          router.replace("/(app)/users");
-        }
-      } else {
-        setIsAuthenticated(false);
-        setUser(null);
-      }
+      setIsAuthenticated(!!authUser);
+      setUser(authUser);
       setLoading(false);
+      if (authUser) {
+        router.replace("/(app)"); // Redirect to the app's main route after login
+      } else {
+        router.replace("/(auth)/login"); // Redirect to login if logged out
+      }
     });
 
     return () => unsubscribe();
@@ -82,29 +67,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const register = async (
-    email: string,
-    password: string,
-    isCompany: boolean,
-    additionalData?: any
-  ) => {
+  const register = async (email: string, password: string) => {
+    // Removed isCompany
     setLoading(true);
     setError(null);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const newUser = userCredential.user;
-      const role = isCompany ? "company" : "user";
-      console.log(
-        "Registration successful for:",
-        newUser.email,
-        "Role:",
-        role,
-        additionalData
-      );
+      await createUserWithEmailAndPassword(auth, email, password);
       toast.success("Registrierung erfolgreich!");
       // Navigation will be handled by the auth state listener
     } catch (err: any) {
