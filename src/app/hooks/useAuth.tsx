@@ -18,7 +18,15 @@ interface AuthContextType {
   register: (
     email: string,
     password: string,
-    additionalData?: { address?: string; whatsappNumber?: string }
+    additionalData: {
+      lastName: string;
+      firstName: string;
+      address: string;
+      taxId: string;
+      idFrontImage: string | null;
+      idBackImage: string | null;
+      whatsappNumber: string;
+    }
   ) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
@@ -64,9 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(authUser);
       setLoading(false);
       if (authUser) {
-        // Fetch additional user data when authenticated
         await fetchAdditionalUserData(authUser.uid);
-        router.replace("/(app)/my-products/index");
+        router.replace("/(app)");
       } else {
         setAdditionalUserData(null);
         router.replace("/(auth)/login");
@@ -116,7 +123,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const register = async (
     email: string,
     password: string,
-    additionalData?: { address?: string; whatsappNumber?: string }
+    additionalData: {
+      lastName: string;
+      firstName: string;
+      address: string;
+      taxId: string;
+      idFrontImage: string | null;
+      idBackImage: string | null;
+      whatsappNumber: string;
+    }
   ) => {
     setLoading(true);
     setError(null);
@@ -127,7 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         password
       );
       if (userCredential.user) {
-        // Store additional data in Firestore
+        // Store all registration data in Firestore
         const userDocRef = doc(db, "users", userCredential.user.uid);
         await setDoc(userDocRef, { ...additionalData });
         toast.success("Registrierung erfolgreich!");
