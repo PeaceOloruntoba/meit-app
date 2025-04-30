@@ -7,7 +7,6 @@ import * as ImagePicker from "expo-image-picker";
 import { toast } from "sonner-native";
 
 const RegisterForm: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"user" | "company">("user");
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,28 +42,30 @@ const RegisterForm: React.FC = () => {
 
   const handleRegister = async () => {
     if (!agbChecked || !privacyChecked) {
-      console.error("Please accept the terms and privacy policy.");
+      toast.error("Bitte akzeptiere die AGB und die Datenschutzbestimmungen.");
       return;
     }
     if (password !== confirmPassword) {
-      console.error("Passwords do not match!");
+      toast.error("Passwörter stimmen nicht überein!");
       return;
     }
-    const isCompanyRegistration = activeTab === "company";
-    const registrationData = {
+
+    const additionalData = {
       lastName,
       firstName,
-      email,
       address,
-      phoneNumber,
-      ...(isCompanyRegistration && { taxId, idFrontImage, idBackImage }),
+      taxId,
+      idFrontImage,
+      idBackImage,
+      whatsappNumber: phoneNumber, // Assuming phoneNumber is for WhatsApp
     };
-    await register(email, password, isCompanyRegistration, registrationData);
+
+    await register(email, password, additionalData);
+
     if (!loading && !error) {
-      console.log("Registration successful!");
-      toast.success("Registration Successful!");
+      toast.success("Registrierung erfolgreich!");
     } else if (error) {
-      console.error("Registration error:", error);
+      toast.error(`Registrierungsfehler: ${error}`);
     }
   };
 
@@ -74,172 +75,86 @@ const RegisterForm: React.FC = () => {
         Registriere dich!
       </Text>
 
-      {/* Tab Bar */}
-      <View className="flex-row w-full mb-6 rounded-xl overflow-hidden bg-white shadow-sm">
-        <TouchableOpacity
-          onPress={() => setActiveTab("user")}
-          className={`flex-1 p-3 items-center justify-center ${
-            activeTab === "user" ? "bg-[#7C5CFC]" : "bg-white"
-          }`}
-        >
-          <Text
-            className={`font-semibold ${
-              activeTab === "user" ? "text-white" : "text-gray-700"
-            }`}
-          >
-            Benutzer
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setActiveTab("company")}
-          className={`flex-1 p-3 items-center justify-center ${
-            activeTab === "company" ? "bg-[#7C5CFC]" : "bg-white"
-          }`}
-        >
-          <Text
-            className={`font-semibold ${
-              activeTab === "company" ? "text-white" : "text-gray-700"
-            }`}
-          >
-            Firma
-          </Text>
-        </TouchableOpacity>
+      <View className="flex-row justify-between w-full mb-4 gap-2">
+        <TextInput
+          placeholder="Nachname"
+          className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
+          value={lastName}
+          onChangeText={setLastName}
+        />
+        <TextInput
+          placeholder="Vorname"
+          className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
       </View>
 
-      {/* User Registration Form */}
-      {activeTab === "user" && (
-        <>
-          <View className="flex-row justify-between w-full mb-4 gap-2">
-            <TextInput
-              placeholder="Nachname"
-              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
-              value={lastName}
-              onChangeText={setLastName}
-            />
-            <TextInput
-              placeholder="Vorname"
-              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
-              value={firstName}
-              onChangeText={setFirstName}
-            />
-          </View>
+      <View className="w-full mb-4">
+        <TextInput
+          placeholder="E-Mail"
+          className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <View className="absolute left-3 top-3">
+          <FontAwesome name="envelope-o" size={20} color="gray" />
+        </View>
+      </View>
 
-          <View className="w-full mb-4">
-            <TextInput
-              placeholder="E-Mail"
-              className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <View className="absolute left-3 top-3">
-              <FontAwesome name="envelope-o" size={20} color="gray" />
-            </View>
-          </View>
+      <TextInput
+        placeholder="Adresse"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+        value={address}
+        onChangeText={setAddress}
+      />
 
-          <TextInput
-            placeholder="Adresse"
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-            value={address}
-            onChangeText={setAddress}
+      <TextInput
+        placeholder="Steuer ID / Umsatzsteuer ID"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+        value={taxId}
+        onChangeText={setTaxId}
+      />
+
+      <TouchableOpacity
+        onPress={() => pickImage(setIdFrontImage)}
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
+      >
+        <Text className="text-gray-500">
+          Bild vom Personalausweis Vorderseite
+        </Text>
+        {idFrontImage && (
+          <Image
+            source={{ uri: idFrontImage }}
+            style={{ width: 100, height: 75, marginTop: 5 }}
           />
+        )}
+      </TouchableOpacity>
 
-          <TextInput
-            placeholder="Telefonnummer - WhatsApp"
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
+      <TouchableOpacity
+        onPress={() => pickImage(setIdBackImage)}
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
+      >
+        <Text className="text-gray-500">
+          Bild vom Personalausweis Rückseite
+        </Text>
+        {idBackImage && (
+          <Image
+            source={{ uri: idBackImage }}
+            style={{ width: 100, height: 75, marginTop: 5 }}
           />
-        </>
-      )}
+        )}
+      </TouchableOpacity>
 
-      {/* Company Registration Form */}
-      {activeTab === "company" && (
-        <>
-          <View className="flex-row justify-between w-full mb-4 gap-2">
-            <TextInput
-              placeholder="Nachname"
-              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
-              value={lastName}
-              onChangeText={setLastName}
-            />
-            <TextInput
-              placeholder="Vorname"
-              className="flex-1 p-3 rounded-xl bg-white text-gray-700 shadow-sm"
-              value={firstName}
-              onChangeText={setFirstName}
-            />
-          </View>
+      <TextInput
+        placeholder="Telefonnummer - WhatsApp"
+        className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
+        keyboardType="phone-pad"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+      />
 
-          <View className="w-full mb-4">
-            <TextInput
-              placeholder="E-Mail"
-              className="w-full p-3 pl-10 rounded-xl bg-white text-gray-700 shadow-sm"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <View className="absolute left-3 top-3">
-              <FontAwesome name="envelope-o" size={20} color="gray" />
-            </View>
-          </View>
-
-          <TextInput
-            placeholder="Adresse"
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-            value={address}
-            onChangeText={setAddress}
-          />
-
-          <TextInput
-            placeholder="Steuer ID / Umsatzsteuer ID"
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-            value={taxId}
-            onChangeText={setTaxId}
-          />
-
-          <TouchableOpacity
-            onPress={() => pickImage(setIdFrontImage)}
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
-          >
-            <Text className="text-gray-500">
-              Bild vom Personalausweis Vorderseite
-            </Text>
-            {idFrontImage && (
-              <Image
-                source={{ uri: idFrontImage }}
-                style={{ width: 100, height: 75, marginTop: 5 }}
-              />
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => pickImage(setIdBackImage)}
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm items-start justify-center"
-          >
-            <Text className="text-gray-500">
-              Bild vom Personalausweis Rückseite
-            </Text>
-            {idBackImage && (
-              <Image
-                source={{ uri: idBackImage }}
-                style={{ width: 100, height: 75, marginTop: 5 }}
-              />
-            )}
-          </TouchableOpacity>
-
-          <TextInput
-            placeholder="Telefonnummer - WhatsApp"
-            className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-          />
-        </>
-      )}
-
-      {/* Common Password Fields and Agreement */}
       <TextInput
         placeholder="Passwort"
         className="w-full p-3 mb-4 rounded-xl bg-white text-gray-700 shadow-sm"
@@ -281,7 +196,7 @@ const RegisterForm: React.FC = () => {
         >
           <View
             className={`w-5 h-5 rounded-md border border-gray-400 mr-2 items-center justify-center ${
-              privacyChecked ? "bg-white" : "bg-white"
+              privacyChecked ? "bg-[#7C5CFC]" : "bg-white"
             }`}
           >
             {privacyChecked && (
@@ -298,14 +213,16 @@ const RegisterForm: React.FC = () => {
           loading ||
           !agbChecked ||
           !privacyChecked ||
-          (activeTab === "company" && (!idFrontImage || !idBackImage))
+          !idFrontImage ||
+          !idBackImage
         }
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
           loading ||
           !agbChecked ||
           !privacyChecked ||
-          (activeTab === "company" && (!idFrontImage || !idBackImage))
-            ? "disabled"
+          !idFrontImage ||
+          !idBackImage
+            ? "opacity-50"
             : ""
         }`}
       >
