@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   collection,
   addDoc,
@@ -61,60 +61,69 @@ const useProduct = (): UseProductHook => {
   const { user } = useAuth();
   const productsCollectionRef = collection(db, "products");
 
-  const handleAsync = async <T>(
-    callback: () => Promise<T>,
-    onSuccessMessage?: string
-  ): Promise<T | null> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await callback();
-      if (onSuccessMessage) toast.success(onSuccessMessage);
-      return result;
-    } catch (err: any) {
-      const message = err.message || "Ein Fehler ist aufgetreten.";
-      setError(message);
-      toast.error(message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleAsync = useCallback(
+    async <T>(
+      callback: () => Promise<T>,
+      onSuccessMessage?: string
+    ): Promise<T | null> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await callback();
+        if (onSuccessMessage) toast.success(onSuccessMessage);
+        return result;
+      } catch (err: any) {
+        const message = err.message || "Ein Fehler ist aufgetreten.";
+        setError(message);
+        toast.error(message);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
-  const addProduct = async (
-    productData: Omit<Product, "id" | "userId">
-  ): Promise<string | null> => {
-    if (!user?.uid) {
-      setError("User not authenticated.");
-      return null;
-    }
-    return await handleAsync(async () => {
-      const docRef = await addDoc(productsCollectionRef, {
-        ...productData,
-        userId: user.uid,
-      });
-      return docRef.id;
-    }, "Produkt erfolgreich hinzugefügt!");
-  };
+  const addProduct = useCallback(
+    async (
+      productData: Omit<Product, "id" | "userId">
+    ): Promise<string | null> => {
+      if (!user?.uid) {
+        setError("User not authenticated.");
+        return null;
+      }
+      return await handleAsync(async () => {
+        const docRef = await addDoc(productsCollectionRef, {
+          ...productData,
+          userId: user.uid,
+        });
+        return docRef.id;
+      }, "Produkt erfolgreich hinzugefügt!");
+    },
+    [user?.uid, handleAsync]
+  );
 
-  const deleteProduct = async (productId: string): Promise<void> => {
-    await handleAsync(async () => {
-      const productDocRef = doc(db, "products", productId);
-      await deleteDoc(productDocRef);
-    }, "Produkt erfolgreich gelöscht!");
-  };
+  const deleteProduct = useCallback(
+    async (productId: string): Promise<void> => {
+      await handleAsync(async () => {
+        const productDocRef = doc(db, "products", productId);
+        await deleteDoc(productDocRef);
+      }, "Produkt erfolgreich gelöscht!");
+    },
+    [handleAsync]
+  );
 
-  const updateProduct = async (
-    productId: string,
-    productData: Partial<Product>
-  ): Promise<void> => {
-    await handleAsync(async () => {
-      const productDocRef = doc(db, "products", productId);
-      await updateDoc(productDocRef, productData);
-    }, "Produkt erfolgreich aktualisiert!");
-  };
+  const updateProduct = useCallback(
+    async (productId: string, productData: Partial<Product>): Promise<void> => {
+      await handleAsync(async () => {
+        const productDocRef = doc(db, "products", productId);
+        await updateDoc(productDocRef, productData);
+      }, "Produkt erfolgreich aktualisiert!");
+    },
+    [handleAsync]
+  );
 
-  const getAllProducts = async (): Promise<Product[]> => {
+  const getAllProducts = useCallback(async (): Promise<Product[]> => {
     const result = await handleAsync(async () => {
       const snapshot = await getDocs(productsCollectionRef);
       return snapshot.docs.map(
@@ -124,22 +133,25 @@ const useProduct = (): UseProductHook => {
 
     if (result) setProducts(result);
     return result || [];
-  };
+  }, [handleAsync, productsCollectionRef]);
 
-  const getProduct = async (productId: string): Promise<Product | null> => {
-    const result = await handleAsync(async () => {
-      const productDocRef = doc(db, "products", productId);
-      const docSnap = await getDoc(productDocRef);
-      return docSnap.exists()
-        ? ({ id: docSnap.id, ...docSnap.data() } as Product)
-        : null;
-    });
+  const getProduct = useCallback(
+    async (productId: string): Promise<Product | null> => {
+      const result = await handleAsync(async () => {
+        const productDocRef = doc(db, "products", productId);
+        const docSnap = await getDoc(productDocRef);
+        return docSnap.exists()
+          ? ({ id: docSnap.id, ...docSnap.data() } as Product)
+          : null;
+      });
 
-    setProduct(result);
-    return result;
-  };
+      setProduct(result);
+      return result;
+    },
+    [handleAsync]
+  );
 
-  const getUserProducts = async (): Promise<Product[]> => {
+  const getUserProducts = useCallback(async (): Promise<Product[]> => {
     if (!user?.uid) {
       setError("User not authenticated.");
       return [];
@@ -155,7 +167,7 @@ const useProduct = (): UseProductHook => {
 
     if (result) setProducts(result);
     return result || [];
-  };
+  }, [user?.uid, handleAsync, productsCollectionRef]);
 
   return {
     loading,
