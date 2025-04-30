@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import Colors from "../constants/Colors";
 import { useEffect } from "react";
 import { Ionicons, Feather } from "@expo/vector-icons";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const AppLayout = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -48,21 +49,23 @@ const AppLayout = () => {
   ];
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: Colors.background }}
-    >
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="my-products/index" />
-        <Stack.Screen name="my-products/[id]" />
-        <Stack.Screen name="add-product" />
-        {/* <Stack.Screen name="[product-details]" /> */}
-        <Stack.Screen name="search" />
-        <Stack.Screen name="rentals/index" />
-        {/* Other Stack Screens */}
-      </Stack>
-      <BottomNav items={navigationItems} />
-    </SafeAreaView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView
+        className="flex-1"
+        style={{ backgroundColor: Colors.background }}
+      >
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="my-products/index" />
+          <Stack.Screen name="my-products/[id]" />
+          <Stack.Screen name="add-product" />
+          {/* <Stack.Screen name="[product-details]" /> */}
+          <Stack.Screen name="search" />
+          <Stack.Screen name="rentals/index" />
+          {/* Other Stack Screens */}
+        </Stack>
+        <BottomNav items={navigationItems} />
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 

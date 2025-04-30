@@ -54,9 +54,9 @@ const ProductDetailsPage = () => {
         Verkäufer: {/* Seller's Name */}
       </Text>
 
-      {product.imageUrl && product.imageUrl.length > 0 && (
+      {product.imageUrls && product.imageUrls.length > 0 && (
         <Image
-          source={{ uri: product.imageUrl[0] }}
+          source={{ uri: product.imageUrls[0] }}
           className="w-full h-64 rounded-md mb-4 object-cover"
         />
       )}

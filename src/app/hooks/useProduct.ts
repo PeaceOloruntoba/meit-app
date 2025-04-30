@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   collection,
   addDoc,
@@ -9,34 +9,30 @@ import {
   getDoc,
   query,
   where,
-  Firestore,
 } from "firebase/firestore";
-import { db, auth } from "../utils/firebaseConfig"; // Assuming you have your Firebase config here
+import { db } from "../utils/firebaseConfig";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner-native";
 
 interface Product {
   id: string;
-  name: string; // You'll need a field for the product name
+  name: string;
   description?: string;
-  imageUrl?: string; // Allow multiple images
-  price?: number; // General price, might be linked to Zeitraum
-  pricePerDay?: number; // Specific price per day
-  pricePerMonth?: number; // Specific price per month (if applicable)
+  imageUrls?: string[]; // Support multiple images
+  price?: number;
+  pricePerDay?: number;
+  pricePerMonth?: number;
   deposit?: number;
-  deliveryAvailable?: boolean; // For the "Zustellung" option
+  deliveryAvailable?: boolean;
   deliveryCost?: number;
-  // The second "Lieferpreis" field is unclear, let's assume it's another delivery option cost or a price range.
-  // You might need to clarify its purpose. For now, I'll add a generic 'additionalDeliveryCost'.
   additionalDeliveryCost?: number;
-  startDate?: string; // For rental periods
-  endDate?: string; // For rental periods
+  startDate?: string;
+  endDate?: string;
   contactEmail?: string;
   contactWebsite?: string;
   contactWhatsApp?: string;
   location?: string;
   userId: string;
-  // Add other relevant fields captured in the "Add Product" screen
 }
 
 interface UseProductHook {
@@ -65,129 +61,100 @@ const useProduct = (): UseProductHook => {
   const { user } = useAuth();
   const productsCollectionRef = collection(db, "products");
 
+  const handleAsync = async <T>(
+    callback: () => Promise<T>,
+    onSuccessMessage?: string
+  ): Promise<T | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await callback();
+      if (onSuccessMessage) toast.success(onSuccessMessage);
+      return result;
+    } catch (err: any) {
+      const message = err.message || "Ein Fehler ist aufgetreten.";
+      setError(message);
+      toast.error(message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addProduct = async (
     productData: Omit<Product, "id" | "userId">
   ): Promise<string | null> => {
-    setLoading(true);
-    setError(null);
     if (!user?.uid) {
       setError("User not authenticated.");
-      setLoading(false);
       return null;
     }
-    try {
+    return await handleAsync(async () => {
       const docRef = await addDoc(productsCollectionRef, {
         ...productData,
         userId: user.uid,
       });
-      toast.success("Produkt erfolgreich hinzugefügt!");
-      setLoading(false);
       return docRef.id;
-    } catch (err: any) {
-      setError(err.message);
-      toast.error("Fehler beim Hinzufügen des Produkts.");
-      setLoading(false);
-      return null;
-    }
+    }, "Produkt erfolgreich hinzugefügt!");
   };
 
   const deleteProduct = async (productId: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
+    await handleAsync(async () => {
       const productDocRef = doc(db, "products", productId);
       await deleteDoc(productDocRef);
-      toast.success("Produkt erfolgreich gelöscht!");
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message);
-      toast.error("Fehler beim Löschen des Produkts.");
-      setLoading(false);
-    }
+    }, "Produkt erfolgreich gelöscht!");
   };
 
   const updateProduct = async (
     productId: string,
     productData: Partial<Product>
   ): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
+    await handleAsync(async () => {
       const productDocRef = doc(db, "products", productId);
       await updateDoc(productDocRef, productData);
-      toast.success("Produkt erfolgreich aktualisiert!");
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message);
-      toast.error("Fehler beim Aktualisieren des Produkts.");
-      setLoading(false);
-    }
+    }, "Produkt erfolgreich aktualisiert!");
   };
 
   const getAllProducts = async (): Promise<Product[]> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const querySnapshot = await getDocs(productsCollectionRef);
-      const productList: Product[] = [];
-      querySnapshot.forEach((doc) => {
-        productList.push({ id: doc.id, ...doc.data() } as Product);
-      });
-      setProducts(productList);
-      setLoading(false);
-      return productList;
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-      return [];
-    }
+    const result = await handleAsync(async () => {
+      const snapshot = await getDocs(productsCollectionRef);
+      return snapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as Product)
+      );
+    });
+
+    if (result) setProducts(result);
+    return result || [];
   };
 
   const getProduct = async (productId: string): Promise<Product | null> => {
-    setLoading(true);
-    setError(null);
-    try {
+    const result = await handleAsync(async () => {
       const productDocRef = doc(db, "products", productId);
       const docSnap = await getDoc(productDocRef);
-      if (docSnap.exists()) {
-        setProduct({ id: docSnap.id, ...docSnap.data() } as Product);
-        setLoading(false);
-        return { id: docSnap.id, ...docSnap.data() } as Product;
-      } else {
-        setProduct(null);
-        setLoading(false);
-        return null;
-      }
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-      return null;
-    }
+      return docSnap.exists()
+        ? ({ id: docSnap.id, ...docSnap.data() } as Product)
+        : null;
+    });
+
+    setProduct(result);
+    return result;
   };
 
   const getUserProducts = async (): Promise<Product[]> => {
-    setLoading(true);
-    setError(null);
     if (!user?.uid) {
       setError("User not authenticated.");
-      setLoading(false);
       return [];
     }
-    try {
+
+    const result = await handleAsync(async () => {
       const q = query(productsCollectionRef, where("userId", "==", user.uid));
-      const querySnapshot = await getDocs(q);
-      const userProductsList: Product[] = [];
-      querySnapshot.forEach((doc) => {
-        userProductsList.push({ id: doc.id, ...doc.data() } as Product);
-      });
-      setProducts(userProductsList);
-      setLoading(false);
-      return userProductsList;
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-      return [];
-    }
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as Product)
+      );
+    });
+
+    if (result) setProducts(result);
+    return result || [];
   };
 
   return {
