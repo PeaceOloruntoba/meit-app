@@ -12,13 +12,13 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Feather } from "@expo/vector-icons";
-import useProduct from "../hooks/useProduct";
+import useProduct from "../hooks/useProduct"; // Import your Firebase-ready hook
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import Colors from "../constants/Colors";
 
 const AddProductPage = () => {
-  const { addProduct } = useProduct();
+  const { addProduct, loading, error } = useProduct(); // Use the hook
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -62,6 +62,10 @@ const AddProductPage = () => {
     const newProductId = await addProduct(productData);
     if (newProductId) {
       router.push(`/[product-details]?id=${newProductId}`);
+    } else if (error) {
+      // You can display the error message to the user here
+      console.error("Error adding product:", error);
+      // Optionally, set a local error state to show in the UI
     }
   };
 
@@ -275,9 +279,14 @@ const AddProductPage = () => {
         <TouchableOpacity
           onPress={handleAddProduct}
           style={[styles.saveButton, { backgroundColor: Colors.primary }]}
+          disabled={loading} // Disable the button while loading
         >
-          <Text style={styles.saveButtonText}>Speichern</Text>
+          <Text style={styles.saveButtonText}>
+            {loading ? "Speichern..." : "Speichern"}
+          </Text>
         </TouchableOpacity>
+
+        {error && <Text style={styles.errorText}>Fehler: {error}</Text>}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -291,16 +300,16 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     padding: 16,
     paddingTop: 64,
-    flexGrow: 1, // Added flexGrow: 1 to potentially help with scrolling
+    flexGrow: 1,
   },
   backButton: {
     position: "absolute",
-    top: 60,
-    right: 30,
+    top: 16,
+    right: 16,
     backgroundColor: "black",
     borderRadius: 8,
     padding: 8,
-    zIndex: 20,
+    zIndex: 10,
   },
   backButtonText: {
     color: "white",
@@ -322,29 +331,24 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.secondary,
+    borderColor: "#ccc",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: "white",
   },
   multilineInput: {
     height: 100,
     textAlignVertical: "top",
-    backgroundColor: "white",
-    borderColor: Colors.secondary,
   },
   picker: {
     borderWidth: 1,
-    borderColor: Colors.secondary,
-    backgroundColor: "white",
+    borderColor: "#ccc",
     borderRadius: 8,
   },
   deliveryToggle: {
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 8,
-    backgroundColor: "white",
     padding: 12,
     borderWidth: 1,
   },
@@ -362,10 +366,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   uploadButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f0f0f0",
     borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: Colors.secondary,
+    borderColor: "#ccc",
     borderRadius: 8,
     padding: 40,
     alignItems: "center",
@@ -389,6 +393,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 10,
+    textAlign: "center",
   },
 });
 
