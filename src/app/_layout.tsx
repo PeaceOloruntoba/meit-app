@@ -4,14 +4,17 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "./hooks/useAuth";
 import Colors from "./constants/Colors";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <StatusBar style="dark" backgroundColor={Colors.background} />
-        <Slot />
-      </AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <StatusBar style="dark" backgroundColor={Colors.background} />
+          <Slot />
+        </AuthProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }
