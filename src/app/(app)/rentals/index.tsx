@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import tw from "twrnc"; // Import the tailwind helper
 
 // Dummy data for rentals (replace with your actual data fetching)
 const dummyRentals = [
@@ -71,7 +70,6 @@ const RentalsPage = () => {
         data={dummyRentals}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <RentalItem rental={item} />}
-        contentContainerStyle={tw`pb-4`} // You can still use 'tw' for FlatList contentContainerStyle
       />
     </View>
   );
