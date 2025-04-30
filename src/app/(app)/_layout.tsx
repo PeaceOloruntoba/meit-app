@@ -54,8 +54,9 @@ const AppLayout = () => {
     >
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="my-products/index" />
+        <Stack.Screen name="my-products/[id]" />
         <Stack.Screen name="add-product" />
-        <Stack.Screen name="[product-details]" />
+        {/* <Stack.Screen name="[product-details]" /> */}
         <Stack.Screen name="search" />
         <Stack.Screen name="rentals/index" />
         {/* Other Stack Screens */}
