@@ -43,7 +43,7 @@ const RentalItem = ({ rental }: { rental: (typeof dummyRentals)[0] }) => {
   return (
     <TouchableOpacity
       onPress={() => router.push(`/rentals/${rental.id}`)}
-      className="bg-card rounded-lg mb-4 overflow-hidden"
+      className="bg-white rounded-lg mb-4 overflow-hidden"
     >
       <Image
         source={{ uri: rental.imageUrl }}
@@ -62,7 +62,7 @@ const RentalItem = ({ rental }: { rental: (typeof dummyRentals)[0] }) => {
 
 const RentalsPage = () => {
   return (
-    <View className="flex-1 bg-background p-4">
+    <View className="flex-1 bg-[#F2F5FA] p-4">
       <Text className="text-2xl font-bold mb-4 text-text">
         Available Rentals in Agege, Nigeria
       </Text>
