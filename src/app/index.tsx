@@ -31,7 +31,9 @@ const SplashScreen = () => {
   if (splashVisible) {
     return (
       <View className="flex-1 justify-center items-center bg-primary">
-        <Text className="text-white text-3xl font-bold mb-4">Meit App</Text>
+        <Text className="text-textPrimary text-3xl font-bold mb-4">
+          Welcome to Meit App
+        </Text>
         <ActivityIndicator size="large" color={Colors.primary} />
         <Toaster richColors />
       </View>
