@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import useProduct from "../hooks/useProduct";
+import useProduct from "../../hooks/useProduct";
 import { ActivityIndicator } from "react-native";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 
 const ProductDetailsPage = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -14,7 +14,7 @@ const ProductDetailsPage = () => {
     if (id) {
       getProduct(id);
     }
-  }, [id, getProduct]);
+  }, [id, getProduct] );
 
   if (loading) {
     return (
