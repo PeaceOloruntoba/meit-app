@@ -40,7 +40,7 @@ const MyProductsPage = () => {
       {products.length > 0 ? (
         <FlatList
           data={products}
-          keyExtractor={(item) => item.id!}
+          keyExtractor={(item) => item.id!} // Assuming 'id' is always present after fetching
           renderItem={({ item }) => <ProductCard {...item} />}
           showsVerticalScrollIndicator={false}
         />
