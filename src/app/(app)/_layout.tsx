@@ -1,81 +1,82 @@
 import { Stack, Redirect, useRouter, usePathname } from "expo-router";
-import { SafeAreaView, View, Text } from "react-native";
+import { SafeAreaView } from "react-native";
 import BottomNav from "../components/UI/BottomNav";
 import { useAuth } from "../hooks/useAuth";
 import Colors from "../constants/Colors";
-import { useEffect, useState } from "react";
-import { auth } from "../utils/firebaseConfig"; // Import auth for user info
+import { useEffect } from "react";
+import { Ionicons, Feather } from "@expo/vector-icons"; // Example icons
 
 const AppLayout = () => {
-  const { isAuthenticated, loading, user } = useAuth();
-  const [isCompanyUser, setIsCompanyUser] = useState<boolean | null>(null);
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname(); // Get the current path
+  const pathname = usePathname();
 
   useEffect(() => {
-    const determineUserRole = async () => {
-      if (user) {
-        setIsCompanyUser(user.email?.includes("company") || false);
-      } else {
-        setIsCompanyUser(null);
-      }
-    };
-
-    determineUserRole();
-  }, [user]);
-
-  useEffect(() => {
-    if (isAuthenticated && isCompanyUser !== null) {
-      if (isCompanyUser && !pathname?.startsWith("/companies")) {
-        router.replace("/companies");
-      } else if (!isCompanyUser && !pathname?.startsWith("/users")) {
-        router.replace("/users");
-      }
+    if (loading) {
+      return; // Don't redirect while loading
     }
-  }, [isAuthenticated, isCompanyUser, pathname, router]);
+    if (!isAuthenticated) {
+      router.replace("/(auth)/login");
+    }
+  }, [isAuthenticated, loading, router]);
 
-  if (loading || isCompanyUser === null) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <Text>Loading...</Text>
-      </View>
-    );
+  if (!isAuthenticated && !loading) {
+    return null; // Or a loading spinner if you prefer
   }
 
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  const userNavigationItems = [
-    { href: "/users", label: "Home", icon: <Text>🏠</Text> }, // Example icon
-    { href: "/users/search", label: "Search", icon: <Text>🔍</Text> },
-    { href: "/users/booking", label: "Bookings", icon: <Text>🗓️</Text> },
-    { href: "/users/profile", label: "Profile", icon: <Text>👤</Text> },
-    { href: "/notifications", label: "Notifications", icon: <Text>🔔</Text> },
-  ];
-
-  const companyNavigationItems = [
-    { href: "/companies", label: "Dashboard", icon: <Text>📊</Text> },
+  const navigationItems = [
     {
-      href: "/companies/products/list",
-      label: "Products",
-      icon: <Text>📦</Text>,
+      href: "/my-products",
+      label: "My Products",
+      icon: <Feather name="list" size={24} color={Colors.primary} />,
     },
-    { href: "/companies/rentals", label: "Rentals", icon: <Text>🔄</Text> },
-    { href: "/companies/profile", label: "Profile", icon: <Text>👤</Text> },
-    { href: "/notifications", label: "Notifications", icon: <Text>🔔</Text> },
+    {
+      href: "/search",
+      label: "Search",
+      icon: <Feather name="search" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/rentals",
+      label: "Rentals",
+      icon: <Feather name="swap-horizontal" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/profile",
+      label: "Profile",
+      icon: <Feather name="user" size={24} color={Colors.primary} />,
+    },
   ];
-
-  const navigationItems = isCompanyUser
-    ? companyNavigationItems
-    : userNavigationItems;
 
   return (
     <SafeAreaView
-      className="bg-black"
-      style={{ flex: 1, backgroundColor: Colors.background }}
+      className="flex-1 bg-black"
+      style={{ backgroundColor: Colors.background }}
     >
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />{" "}
+        {/* Optional: If you have a default screen in (app) */}
+        <Stack.Screen
+          name="my-products/index"
+          options={{ headerShown: true, headerTitle: "Meine Produkte" }}
+        />
+        <Stack.Screen
+          name="search"
+          options={{ headerShown: true, headerTitle: "Suche" }}
+        />
+        <Stack.Screen
+          name="rentals/index"
+          options={{ headerShown: true, headerTitle: "Meine Mietvorgänge" }}
+        />
+        <Stack.Screen
+          name="profile"
+          options={{ headerShown: true, headerTitle: "Profil" }}
+        />
+        <Stack.Screen
+          name="[product-details]"
+          options={{ headerShown: true, headerTitle: "Produkt Details" }}
+        />{" "}
+        {/* Example dynamic route */}
+      </Stack>
       <BottomNav items={navigationItems} />
     </SafeAreaView>
   );
