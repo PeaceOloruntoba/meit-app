@@ -8,7 +8,7 @@ import {
   Text,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import  useProduct from "../hooks/useProduct";
+import useProduct from "../hooks/useProduct";
 import ProductCard from "../components/UI/ProductCard";
 
 const SearchScreen = () => {
