@@ -16,6 +16,7 @@ import useProduct from "../hooks/useProduct"; // Import your Firebase-ready hook
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import Colors from "../constants/Colors";
+import { toast } from "sonner-native";
 
 const AddProductPage = () => {
   const { addProduct, loading, error } = useProduct(); // Use the hook
@@ -80,6 +81,10 @@ const AddProductPage = () => {
       setImageUrl(result.assets[0].uri);
     }
   };
+
+  if (error) {
+    toast.error(error);
+  }
 
   return (
     <KeyboardAvoidingView
@@ -286,7 +291,7 @@ const AddProductPage = () => {
           </Text>
         </TouchableOpacity>
 
-        {error && <Text style={styles.errorText}>Fehler: {error}</Text>}
+        {/* {error && <Text style={styles.errorText}>Fehler: {error}</Text>} */}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -331,7 +336,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: Colors.secondary,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -342,7 +347,7 @@ const styles = StyleSheet.create({
   },
   picker: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: Colors.secondary,
     borderRadius: 8,
   },
   deliveryToggle: {
@@ -357,7 +362,7 @@ const styles = StyleSheet.create({
     borderColor: "green",
   },
   deliveryInactive: {
-    borderColor: "#ccc",
+    borderColor: Colors.secondary,
   },
   deliveryIcon: {
     marginRight: 8,
@@ -366,10 +371,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   uploadButton: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#fff",
     borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "#ccc",
+    borderColor: Colors.secondary,
     borderRadius: 8,
     padding: 40,
     alignItems: "center",
