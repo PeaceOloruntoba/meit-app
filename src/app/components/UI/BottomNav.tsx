@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
-import { Link, usePathname, useRouter } from 'expo-router';
-import Colors from '../../constants/Colors';
+import React from "react";
+import { View, TouchableOpacity, Text } from "react-native";
+import { Link, usePathname, useRouter } from "expo-router";
+import Colors from "../../constants/Colors";
 
 interface BottomNavItem {
   href: string;
   label: string;
-  icon?: React.ReactNode; // You can use an icon library here (e.g., Ionicons, Feather)
+  icon?: React.ReactNode;
 }
 
 interface BottomNavProps {
@@ -23,10 +23,16 @@ const BottomNav: React.FC<BottomNavProps> = ({ items }) => {
         <TouchableOpacity
           key={item.href}
           onPress={() => router.push(item.href)}
-          className={`flex-1 items-center py-2 ${pathname === item.href ? '' : ''}`}
+          className={`flex-1 items-center py-2 ${
+            pathname === item.href ? "" : ""
+          }`}
         >
           {item.icon && <View className="mb-1">{item.icon}</View>}
-          <Text className={`text-xs text-gray-500 ${pathname === item.href ? 'text-primary font-semibold' : ''}`}>
+          <Text
+            className={`text-xs text-gray-500 ${
+              pathname === item.href ? "text-primary font-semibold" : ""
+            }`}
+          >
             {item.label}
           </Text>
         </TouchableOpacity>
