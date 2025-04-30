@@ -6,12 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // For the "zeitraum" dropdown
-import { Feather } from "@expo/vector-icons"; // For icons
+import { Picker } from "@react-native-picker/picker";
+import { Feather } from "@expo/vector-icons";
 import useProduct from "../hooks/useProduct";
 import { useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker"; // For image uploading
+import * as ImagePicker from "expo-image-picker";
 import Colors from "../constants/Colors";
 
 const AddProductPage = () => {
@@ -28,7 +31,7 @@ const AddProductPage = () => {
   const [additionalDeliveryCost, setAdditionalDeliveryCost] = useState<
     number | undefined
   >();
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // Single image URL state
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
@@ -40,7 +43,7 @@ const AddProductPage = () => {
     const productData = {
       name,
       description,
-      imageUrl, // Still using array for now, see note below
+      imageUrl,
       price,
       pricePerDay: timePeriod === "Tag" ? price : undefined,
       pricePerMonth: timePeriod === "Monat" ? price : undefined,
@@ -65,7 +68,7 @@ const AddProductPage = () => {
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: false, // Only allow single selection
+      allowsMultipleSelection: false,
       quality: 0.5,
     });
 
@@ -75,210 +78,318 @@ const AddProductPage = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-backgroundColor p-4 pt-20">
-      <TouchableOpacity
-        onPress={() => router.back()}
-        className="absolute top-2 right-4 bg-black rounded-md p-2 z-10"
-      >
-        <Text className="text-white text-2xl px-2">X</Text>
-      </TouchableOpacity>
-      <Text className="text-2xl font-bold mb-4">Produkt hinzufügen</Text>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Name</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="Produktname"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Beschreibung</Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          className="border border-gray-300 rounded-md p-2 h-24"
-          placeholder="Produktbeschreibung"
-          multiline
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Preis [in €]</Text>
-        <TextInput
-          value={price ? price.toString() : ""}
-          onChangeText={(text) => setPrice(Number(text) || undefined)}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="Preis"
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">zeitraum</Text>
-        <Picker
-          selectedValue={timePeriod}
-          onValueChange={(itemValue) => setTimePeriod(itemValue)}
-          className="border border-gray-300 rounded-md"
-        >
-          <Picker.Item label="Tag" value="Tag" />
-          <Picker.Item label="Monat" value="Monat" />
-          {/* Add other time periods if needed */}
-        </Picker>
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Kaution</Text>
-        <TextInput
-          value={deposit ? deposit.toString() : ""}
-          onChangeText={(text) => setDeposit(Number(text) || undefined)}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="Kaution"
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Zustellung</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+    >
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <TouchableOpacity
-          onPress={() => setDeliveryAvailable(!deliveryAvailable)}
-          className={`flex-row items-center rounded-md p-2 ${
-            deliveryAvailable
-              ? "bg-green-100 border-green-500"
-              : "border border-gray-300"
-          }`}
+          onPress={() => router.back()}
+          style={styles.backButton}
         >
-          <Feather
-            name={deliveryAvailable ? "check-circle" : "circle"}
-            size={20}
-            color={deliveryAvailable ? "green" : "gray"}
-            className="mr-2"
-          />
-          <Text>{deliveryAvailable ? "Ja" : "Nein"}</Text>
+          <Text style={styles.backButtonText}>X</Text>
         </TouchableOpacity>
-      </View>
+        <Text style={styles.headerText}>Produkt hinzufügen</Text>
 
-      {deliveryAvailable && (
-        <View className="mb-4">
-          <Text className="text-sm font-medium mb-1">Lieferpreis</Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Name</Text>
           <TextInput
-            value={deliveryCost ? deliveryCost.toString() : ""}
-            onChangeText={(text) => setDeliveryCost(Number(text) || undefined)}
-            className="border border-gray-300 rounded-md p-2"
-            placeholder="Lieferpreis"
+            value={name}
+            onChangeText={setName}
+            style={styles.input}
+            placeholder="Produktname"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Beschreibung</Text>
+          <TextInput
+            value={description}
+            onChangeText={setDescription}
+            style={[styles.input, styles.multilineInput]}
+            placeholder="Produktbeschreibung"
+            multiline
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Preis [in €]</Text>
+          <TextInput
+            value={price ? price.toString() : ""}
+            onChangeText={(text) => setPrice(Number(text) || undefined)}
+            style={styles.input}
+            placeholder="Preis"
             keyboardType="numeric"
           />
         </View>
-      )}
-      {deliveryAvailable && (
-        <View className="mb-4">
-          <Text className="text-sm font-medium mb-1">
-            Zusätzlicher Lieferpreis
-          </Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>zeitraum</Text>
+          <Picker
+            selectedValue={timePeriod}
+            onValueChange={(itemValue) => setTimePeriod(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Tag" value="Tag" />
+            <Picker.Item label="Monat" value="Monat" />
+            {/* Add other time periods if needed */}
+          </Picker>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Kaution</Text>
           <TextInput
-            value={
-              additionalDeliveryCost ? additionalDeliveryCost.toString() : ""
-            }
-            onChangeText={(text) =>
-              setAdditionalDeliveryCost(Number(text) || undefined)
-            }
-            className="border border-gray-300 rounded-md p-2"
-            placeholder="Zusätzlicher Lieferpreis"
+            value={deposit ? deposit.toString() : ""}
+            onChangeText={(text) => setDeposit(Number(text) || undefined)}
+            style={styles.input}
+            placeholder="Kaution"
             keyboardType="numeric"
           />
         </View>
-      )}
 
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Startdatum</Text>
-        <TextInput
-          value={startDate}
-          onChangeText={setStartDate}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="YYYY-MM-DD"
-        />
-      </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Zustellung</Text>
+          <TouchableOpacity
+            onPress={() => setDeliveryAvailable(!deliveryAvailable)}
+            style={[
+              styles.deliveryToggle,
+              deliveryAvailable
+                ? styles.deliveryActive
+                : styles.deliveryInactive,
+            ]}
+          >
+            <Feather
+              name={deliveryAvailable ? "check-circle" : "circle"}
+              size={20}
+              color={deliveryAvailable ? "green" : "gray"}
+              style={styles.deliveryIcon}
+            />
+            <Text>{deliveryAvailable ? "Ja" : "Nein"}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Enddatum</Text>
-        <TextInput
-          value={endDate}
-          onChangeText={setEndDate}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="YYYY-MM-DD"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Kontakt Email</Text>
-        <TextInput
-          value={contactEmail}
-          onChangeText={setContactEmail}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="Email"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Kontakt Website</Text>
-        <TextInput
-          value={contactWebsite}
-          onChangeText={setContactWebsite}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="Website"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Kontakt WhatsApp</Text>
-        <TextInput
-          value={contactWhatsApp}
-          onChangeText={setContactWhatsApp}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="WhatsApp"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Standort</Text>
-        <TextInput
-          value={location}
-          onChangeText={setLocation}
-          className="border border-gray-300 rounded-md p-2"
-          placeholder="Standort"
-        />
-      </View>
-
-      <View className="mb-4">
-        <Text className="text-sm font-medium mb-1">Bild hochladen</Text>
-        <TouchableOpacity
-          onPress={pickImage}
-          className="bg-gray-100 border border-dashed border-gray-400 rounded-md p-10 flex items-center justify-center"
-        >
-          <Feather name="upload" size={24} color="gray" />
-        </TouchableOpacity>
-        {imageUrl && (
-          <View className="mt-4">
-            <Image
-              source={{ uri: imageUrl }}
-              className="w-20 h-20 rounded-md"
+        {deliveryAvailable && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Lieferpreis</Text>
+            <TextInput
+              value={deliveryCost ? deliveryCost.toString() : ""}
+              onChangeText={(text) =>
+                setDeliveryCost(Number(text) || undefined)
+              }
+              style={styles.input}
+              placeholder="Lieferpreis"
+              keyboardType="numeric"
             />
           </View>
         )}
-      </View>
+        {deliveryAvailable && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Zusätzlicher Lieferpreis</Text>
+            <TextInput
+              value={
+                additionalDeliveryCost ? additionalDeliveryCost.toString() : ""
+              }
+              onChangeText={(text) =>
+                setAdditionalDeliveryCost(Number(text) || undefined)
+              }
+              style={styles.input}
+              placeholder="Zusätzlicher Lieferpreis"
+              keyboardType="numeric"
+            />
+          </View>
+        )}
 
-      <TouchableOpacity
-        onPress={handleAddProduct}
-        className="bg-black rounded-md p-3 mt-6"
-      >
-        <Text className="text-white text-lg font-semibold text-center">
-          Speichern
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Startdatum</Text>
+          <TextInput
+            value={startDate}
+            onChangeText={setStartDate}
+            style={styles.input}
+            placeholder="YYYY-MM-DD"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Enddatum</Text>
+          <TextInput
+            value={endDate}
+            onChangeText={setEndDate}
+            style={styles.input}
+            placeholder="YYYY-MM-DD"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Kontakt Email</Text>
+          <TextInput
+            value={contactEmail}
+            onChangeText={setContactEmail}
+            style={styles.input}
+            placeholder="Email"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Kontakt Website</Text>
+          <TextInput
+            value={contactWebsite}
+            onChangeText={setContactWebsite}
+            style={styles.input}
+            placeholder="Website"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Kontakt WhatsApp</Text>
+          <TextInput
+            value={contactWhatsApp}
+            onChangeText={setContactWhatsApp}
+            style={styles.input}
+            placeholder="WhatsApp"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Standort</Text>
+          <TextInput
+            value={location}
+            onChangeText={setLocation}
+            style={styles.input}
+            placeholder="Standort"
+          />
+        </View>
+
+        <View style={styles.uploadContainer}>
+          <Text style={styles.label}>Bild hochladen</Text>
+          <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
+            <Feather name="upload" size={24} color="gray" />
+          </TouchableOpacity>
+          {imageUrl && (
+            <View style={styles.imagePreviewContainer}>
+              <Image source={{ uri: imageUrl }} style={styles.imagePreview} />
+            </View>
+          )}
+        </View>
+
+        <TouchableOpacity
+          onPress={handleAddProduct}
+          style={[styles.saveButton, { backgroundColor: Colors.primary }]}
+        >
+          <Text style={styles.saveButtonText}>Speichern</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollViewContent: {
+    padding: 16,
+    paddingTop: 64,
+    flexGrow: 1, // Added flexGrow: 1 to potentially help with scrolling
+  },
+  backButton: {
+    position: "absolute",
+    top: 60,
+    right: 30,
+    backgroundColor: "black",
+    borderRadius: 8,
+    padding: 8,
+    zIndex: 20,
+  },
+  backButtonText: {
+    color: "white",
+    fontSize: 18,
+    paddingHorizontal: 4,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  inputContainer: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "medium",
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.secondary,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "white",
+  },
+  multilineInput: {
+    height: 100,
+    textAlignVertical: "top",
+    backgroundColor: "white",
+    borderColor: Colors.secondary,
+  },
+  picker: {
+    borderWidth: 1,
+    borderColor: Colors.secondary,
+    backgroundColor: "white",
+    borderRadius: 8,
+  },
+  deliveryToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: "white",
+    padding: 12,
+    borderWidth: 1,
+  },
+  deliveryActive: {
+    backgroundColor: "#e6ffe6",
+    borderColor: "green",
+  },
+  deliveryInactive: {
+    borderColor: "#ccc",
+  },
+  deliveryIcon: {
+    marginRight: 8,
+  },
+  uploadContainer: {
+    marginBottom: 16,
+  },
+  uploadButton: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: Colors.secondary,
+    borderRadius: 8,
+    padding: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  imagePreviewContainer: {
+    marginTop: 16,
+  },
+  imagePreview: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  saveButton: {
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 24,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
 
 export default AddProductPage;
