@@ -17,7 +17,7 @@ const SplashScreen = () => {
       if (!loading) {
         if (isAuthenticated) {
           // Redirect authenticated users to the user home page
-          router.replace("/(app)/users");
+          router.replace("/(app)/my-products/index");
         } else {
           // Redirect unauthenticated users to the default home page with login/signup
           router.replace("/home");

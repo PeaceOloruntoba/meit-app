@@ -1,24 +1,41 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth } from "../utils/firebaseConfig";
+import { auth, db } from "../utils/firebaseConfig"; // Import db
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   User,
-  updateProfile, // Import updateProfile
+  updateProfile,
 } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import { useRouter } from "expo-router";
-import { toast } from "sonner-native"; // Import the hook
+import { toast } from "sonner-native";
 
 interface AuthContextType {
   isAuthenticated: boolean | null;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>; // Removed isCompany
+  register: (
+    email: string,
+    password: string,
+    additionalData?: { address?: string; whatsappNumber?: string }
+  ) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
   error: string | null;
-  updateUserProfile: (displayName?: string | null) => Promise<void>; // Add updateProfile function
+  updateUserProfile: (displayName?: string | null) => Promise<void>;
+  updateAdditionalUserData: (data: {
+    address?: string;
+    taxId?: string;
+    whatsappNumber?: string;
+  }) => Promise<void>;
+  additionalUserData: {
+    address?: string | null;
+    taxId?: string | null;
+    whatsappNumber?: string | null;
+  } | null;
+  loadingAdditionalData: boolean;
+  errorAdditionalData: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,32 +47,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [additionalUserData, setAdditionalUserData] = useState<{
+    address?: string | null;
+    taxId?: string | null;
+    whatsappNumber?: string | null;
+  } | null>(null);
+  const [loadingAdditionalData, setLoadingAdditionalData] = useState(true);
+  const [errorAdditionalData, setErrorAdditionalData] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
       setIsAuthenticated(!!authUser);
       setUser(authUser);
       setLoading(false);
       if (authUser) {
-        router.replace("/(app)"); // Redirect to the app's main route after login
+        // Fetch additional user data when authenticated
+        await fetchAdditionalUserData(authUser.uid);
+        router.replace("/(app)/my-products/index");
       } else {
-        router.replace("/(auth)/login"); // Redirect to login if logged out
+        setAdditionalUserData(null);
+        router.replace("/(auth)/login");
       }
     });
 
     return () => unsubscribe();
-  }, [router]); // Add router to the dependency array
+  }, [router]);
+
+  const fetchAdditionalUserData = async (uid: string) => {
+    setLoadingAdditionalData(true);
+    setErrorAdditionalData(null);
+    try {
+      const userDocRef = doc(db, "users", uid);
+      const docSnap = await getDoc(userDocRef);
+      if (docSnap.exists()) {
+        setAdditionalUserData(docSnap.data() as any);
+      } else {
+        setAdditionalUserData({}); // Initialize if no data exists yet
+      }
+    } catch (err: any) {
+      setErrorAdditionalData(err.message);
+    } finally {
+      setLoadingAdditionalData(false);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Login erfolgreich!", {
-        duration: 6000,
-      });
-      // Navigation is handled in the onAuthStateChanged listener
+      toast.success("Login erfolgreich!", { duration: 6000 });
     } catch (err: any) {
       if (err.code === "auth/user-not-found") {
         setError("Benutzer mit dieser E-Mail wurde nicht gefunden.");
@@ -69,14 +113,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const register = async (email: string, password: string) => {
-    // Removed isCompany
+  const register = async (
+    email: string,
+    password: string,
+    additionalData?: { address?: string; whatsappNumber?: string }
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      toast.success("Registrierung erfolgreich!");
-      // Navigation will be handled by the auth state listener
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredential.user) {
+        // Store additional data in Firestore
+        const userDocRef = doc(db, "users", userCredential.user.uid);
+        await setDoc(userDocRef, { ...additionalData });
+        toast.success("Registrierung erfolgreich!");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -102,16 +157,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
     try {
       if (auth.currentUser && displayName !== undefined) {
-        await updateProfile(auth.currentUser, {
-          displayName: displayName,
-        });
-        // Update the local user state
+        await updateProfile(auth.currentUser, { displayName });
         setUser({ ...auth.currentUser, displayName });
         toast.success("Profil erfolgreich aktualisiert!");
       }
     } catch (err: any) {
       setError(err.message);
       toast.error("Fehler beim Aktualisieren des Profils.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateAdditionalUserData = async (data: {
+    address?: string;
+    taxId?: string;
+    whatsappNumber?: string;
+  }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (auth.currentUser) {
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        await setDoc(userDocRef, data, { merge: true }); // Use merge to update specific fields
+        setAdditionalUserData({ ...additionalUserData, ...data }); // Update local state
+        toast.success("Zusätzliche Daten erfolgreich aktualisiert!");
+      } else {
+        setError("Benutzer nicht authentifiziert.");
+      }
+    } catch (err: any) {
+      setError(err.message);
+      toast.error("Fehler beim Aktualisieren der zusätzlichen Daten.");
     } finally {
       setLoading(false);
     }
@@ -127,7 +203,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         loading,
         error,
-        updateUserProfile, // Include the new function in the context
+        updateUserProfile,
+        updateAdditionalUserData,
+        additionalUserData,
+        loadingAdditionalData,
+        errorAdditionalData,
       }}
     >
       {children}
