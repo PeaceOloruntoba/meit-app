@@ -38,7 +38,16 @@
       "firebaseProjectId": "YOUR_PROJECT_ID",
       "firebaseStorageBucket": "YOUR_STORAGE_BUCKET",
       "firebaseMessagingSenderId": "YOUR_MESSAGING_SENDER_ID",
-      "firebaseAppId": "YOUR_APP_ID"
+      "firebaseAppId": "YOUR_APP_ID",
+      "router": {
+        "origin": "https://n"
+      },
+      "eas": {
+        "projectId": "4b9a4612-8457-4a76-b812-c8b14c82a6a0"
+      }
+    },
+    "android": {
+      "package": "com.peaceoloruntoba.meitapp"
     }
   }
 }
