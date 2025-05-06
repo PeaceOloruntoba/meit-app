@@ -7,8 +7,7 @@ import { Feather } from "@expo/vector-icons";
 
 interface BottomNavItem {
   href: string;
-  icon: React.ReactNode;
-  activeIcon?: React.ReactNode;
+  icon: React.ReactElement<React.ComponentProps<typeof Feather>>;
 }
 
 interface BottomNavProps {
@@ -24,14 +23,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ items }) => {
       {items.map((item) => {
         const isActive = pathname?.startsWith(item.href);
         const iconColor = isActive ? Colors.primary : Colors.textPrimary;
-
-        const coloredIcon = React.cloneElement(
-          item.icon as React.ReactElement,
-          {
-            color: iconColor,
-          }
-        );
-
+        const coloredIcon = React.cloneElement(item.icon, { color: iconColor });
         return (
           <TouchableOpacity
             key={item.href}
