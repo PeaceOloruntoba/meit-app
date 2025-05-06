@@ -3,9 +3,16 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "extends": "expo/tsconfig.base",
-  "include": ["global.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": [
+    "global.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "nativewind-env.d.ts"
+  ]
 }
