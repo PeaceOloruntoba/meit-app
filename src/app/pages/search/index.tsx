@@ -26,26 +26,10 @@ const SearchScreen = () => {
 
   const handleFilter = () => {
     console.log("Navigating to filters");
-    router.push("/filters");
   };
 
   const navigateToDetails = () => {
-    router.push("/search-details");
-  };
-
-  const navigateToProducts = () => {
-    router.push("/products");
-  };
-
-  const navigateToProfile = () => {
-    router.push("/profile");
-  };
-
-  const navigate = () => {
-    router.push({
-      pathname: "/search",
-      params: { id: "123", name: "Awesome Product" },
-    });
+    router.push("/pages/search/123");
   };
 
   return (
@@ -81,16 +65,7 @@ const SearchScreen = () => {
             onPress={navigateToDetails}
             className="bg-gray-200 p-4 rounded-lg mb-4 items-center"
           >
-            <Text className="text-lg font-bold">Go to Search Details</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={navigate}
-            className="bg-gray-200 p-4 rounded-lg mb-4 items-center"
-          >
-            <Text className="text-lg font-bold">
-              Go to Product Details (with params)
-            </Text>
+            <Text className="text-lg font-bold">Go to Search Details (ID)</Text>
           </TouchableOpacity>
         </View>
       </View>
