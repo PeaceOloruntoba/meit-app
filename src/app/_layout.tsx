@@ -3,6 +3,7 @@ import "../global.css";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
+import { Toaster } from "sonner-native";
 
 export default function Layout() {
   return (
@@ -11,6 +12,7 @@ export default function Layout() {
         {/* <AuthProvider> */}
         <StatusBar style="dark" />
         <Slot />
+        <Toaster richColors />
         {/* </AuthProvider> */}
       </GestureHandlerRootView>
     </SafeAreaProvider>
