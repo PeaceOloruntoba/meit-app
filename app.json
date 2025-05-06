@@ -3,8 +3,6 @@
     "scheme": "acme",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
-    "jsEngine": "hermes",
-    "newArchEnabled": true,
     "web": {
       "output": "static"
     },
@@ -14,40 +12,9 @@
         {
           "origin": "https://n"
         }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
       ]
     ],
     "name": "meit-app",
-    "slug": "meit-app",
-    "extra": {
-      "primaryColor": "#7D7AFF",
-      "secondaryColor": "#1E20241A",
-      "backgroundColor": "#F2F5FA",
-      "textPrimaryColor": "#000000",
-      "textSecondaryColor": "#838D95",
-      "successColor": "#28a745",
-      "errorColor": "#dc3545",
-      "warningColor": "#ffc107",
-      "firebaseApiKey": "YOUR_API_KEY",
-      "firebaseAuthDomain": "YOUR_AUTH_DOMAIN",
-      "firebaseProjectId": "YOUR_PROJECT_ID",
-      "firebaseStorageBucket": "YOUR_STORAGE_BUCKET",
-      "firebaseMessagingSenderId": "YOUR_MESSAGING_SENDER_ID",
-      "firebaseAppId": "YOUR_APP_ID",
-      "router": {
-        "origin": "https://n"
-      },
-      "eas": {
-        "projectId": "4b9a4612-8457-4a76-b812-c8b14c82a6a0"
-      }
-    },
-    "android": {
-      "package": "com.peaceoloruntoba.meitapp"
-    }
+    "slug": "meit-app"
   }
 }
