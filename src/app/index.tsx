@@ -8,6 +8,7 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
+import BottomNav from "./components/BottomNav";
 
 export default function Page() {
   const navigationItems = [
@@ -30,11 +31,13 @@ export default function Page() {
   ];
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F2F5FA" }}>
-      <Stack screenOptions={{ headerShown: false }} />
-      <Stack.Screen name="screens/search" />
-      <Stack.Screen name="screens/products" />
-      <Stack.Screen name="screens/overview" />
-      <Stack.Screen name="screens/profile" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="screens/search" />
+        <Stack.Screen name="screens/products" />
+        <Stack.Screen name="screens/overview" />
+        <Stack.Screen name="screens/profile" />
+      </Stack>
+      <BottomNav items={navigationItems} />
     </SafeAreaView>
   );
 }
