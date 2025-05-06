@@ -19,7 +19,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ items }) => {
   const router = useRouter();
 
   return (
-    <View className="flex-row justify-around items-center bg-white border-t border-gray-200 py-2">
+    <View className="flex-row justify-around items-center bg-white border-t border-gray-200 py-2 rounded-t-lg">
       {items.map((item) => {
         const isActive = pathname?.startsWith(item.href);
         const iconColor = isActive ? Colors.primary : Colors.textPrimary;
