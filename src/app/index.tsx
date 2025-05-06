@@ -32,6 +32,9 @@ export default function Page() {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F2F5FA" }}>
       <Stack screenOptions={{ headerShown: false }} />
       <Stack.Screen name="screens/search" />
+      <Stack.Screen name="screens/products" />
+      <Stack.Screen name="screens/overview" />
+      <Stack.Screen name="screens/profile" />
     </SafeAreaView>
   );
 }
