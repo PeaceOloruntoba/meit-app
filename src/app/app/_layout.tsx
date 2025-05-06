@@ -48,8 +48,8 @@ const AppLayout = () => {
       style={{ backgroundColor: Colors.background }}
     >
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="search" />
-        <Stack.Screen name="profile" />
+        <Stack.Screen name="app/search" />
+        <Stack.Screen name="app/profile" />
       </Stack>
       <BottomNav items={navigationItems} />
     </SafeAreaView>
