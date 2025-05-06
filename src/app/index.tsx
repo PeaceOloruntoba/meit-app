@@ -1,16 +1,36 @@
-import { Link } from "expo-router";
+import { Link, Stack } from "expo-router";
 import React from "react";
 import { Button, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { toast } from "sonner-native";
 
 export default function Page() {
+  const navigationItems = [
+    {
+      href: "/search",
+      icon: <Feather name="grid" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/products",
+      icon: <Feather name="search" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/overview",
+      icon: <Feather name="list" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/profile",
+      icon: <Feather name="user" size={24} color={Colors.primary} />,
+    },
+  ];
   return (
-    <View className="flex flex-1">
-      <Header />
-      <Content />
-      <Footer />
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F2F5FA" }}>
+      <Stack screenOptions={{ headerShown: false }} />
+      <Stack.Screen name="screens/search" />
+    </SafeAreaView>
   );
 }
 

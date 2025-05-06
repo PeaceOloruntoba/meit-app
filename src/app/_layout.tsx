@@ -7,7 +7,7 @@ import { Toaster } from "sonner-native";
 
 export default function Layout() {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider >
       <GestureHandlerRootView style={{ flex: 1 }}>
         {/* <AuthProvider> */}
         <StatusBar style="dark" />
