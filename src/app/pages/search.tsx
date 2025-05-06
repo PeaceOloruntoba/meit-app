@@ -3,7 +3,7 @@ import { View, Text, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
 
-const SplashScreen = () => {
+const SearchScreen = () => {
   const router = useRouter();
 
   return (
@@ -16,4 +16,4 @@ const SplashScreen = () => {
   );
 };
 
-export default SplashScreen;
+export default SearchScreen;
