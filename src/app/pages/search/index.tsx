@@ -7,10 +7,11 @@ const SearchScreen = () => {
   const router = useRouter();
 
   return (
-    <View className="flex-1 justify-center items-center bg-primary">
-      <Text className="text-textPrimary text-3xl font-bold mb-4">
-        Welcome to Meit App: Search
-      </Text>
+    <View className="flex-1 items-center bg-primary mt-20">
+      <View className="flex w-full gap-4">
+      <input type="search" className="w-full bg-white p-2 rounded-lg" placeholder="Suche..." />
+      <button className="p-2"></button>
+      </View>
       <ActivityIndicator size="large" color={Colors.primary} />
     </View>
   );
