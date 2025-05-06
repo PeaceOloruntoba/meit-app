@@ -1,12 +1,8 @@
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
-import { Link, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import React from "react";
-import { Button, Text, View } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
 import BottomNav from "./components/BottomNav";
 
