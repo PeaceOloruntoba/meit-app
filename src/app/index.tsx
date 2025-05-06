@@ -1,4 +1,5 @@
 import Colors from "@/constants/Colors";
+import { Feather } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
 import React from "react";
 import { Button, Text, View } from "react-native";
