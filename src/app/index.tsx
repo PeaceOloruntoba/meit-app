@@ -1,12 +1,13 @@
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
-import { Stack } from "expo-router";
-import React from "react";
+import { Stack, useRouter } from "expo-router";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
 import BottomNav from "./components/BottomNav";
 
 export default function Page() {
+  const router = useRouter();
   const navigationItems = [
     {
       href: "/search",
@@ -25,6 +26,11 @@ export default function Page() {
       icon: <Feather name="user" size={24} color={Colors.primary} />,
     },
   ];
+
+  useEffect(() => {
+    router.replace("/search");
+  }, []); // Run only once on mount
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F2F5FA" }}>
       <Stack screenOptions={{ headerShown: false }}>
