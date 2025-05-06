@@ -40,7 +40,7 @@ function Content() {
               </Link>
               <Button
                 title="Show Toast"
-                onPress={() => toast.success("Hello, World!")}
+                onPress={() => toast.error("Hello, World!")}
               />
             </View>
           </View>
