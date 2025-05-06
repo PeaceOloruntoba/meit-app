@@ -12,7 +12,7 @@ const SplashScreen = () => {
     // Simulate a loading process (e.g., checking auth state)
     const timer = setTimeout(() => {
       setSplashVisible(false);
-      router.replace("search");
+      router.replace("pages/search");
     }, 3000); // 3-second splash screen
 
     return () => clearTimeout(timer);

@@ -12,19 +12,19 @@ import { Feather } from "@expo/vector-icons";
 export default function Layout() {
   const navigationItems = [
     {
-      href: "/search",
+      href: "/pages/search",
       icon: <Feather name="search" size={24} color={Colors.primary} />,
     },
     {
-      href: "/products",
+      href: "/pages/products",
       icon: <Feather name="grid" size={24} color={Colors.primary} />,
     },
     {
-      href: "/rentals",
+      href: "/pages/rentals",
       icon: <Feather name="list" size={24} color={Colors.primary} />,
     },
     {
-      href: "/profile",
+      href: "/pages/profile",
       icon: <Feather name="user" size={24} color={Colors.primary} />,
     },
   ];
