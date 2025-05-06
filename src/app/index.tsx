@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
 import BottomNav from "./components/BottomNav";
+import { Text } from "react-native";
 
 export default function Page() {
   const router = useRouter();
@@ -27,13 +28,14 @@ export default function Page() {
     },
   ];
 
-  useEffect(() => {
-    router.replace("/search");
-  }, []); // Run only once on mount
+  // useEffect(() => {
+  //   router.replace("/search");
+  // }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F2F5FA" }}>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Text>Home page</Text>
+      {/* <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="search" />
         <Stack.Screen name="screens/search-details" />
         <Stack.Screen name="products" />
@@ -45,8 +47,8 @@ export default function Page() {
         <Stack.Screen name="screens/edit-profile" />
         <Stack.Screen name="screens/login" />
         <Stack.Screen name="screens/register" />
-      </Stack>
-      <BottomNav items={navigationItems} />
+      </Stack> */}
+      {/* <BottomNav items={navigationItems} /> */}
     </SafeAreaView>
   );
 }

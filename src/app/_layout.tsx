@@ -8,18 +8,18 @@ import { Toaster } from "sonner-native";
 export default function Layout() {
   return (
     <SafeAreaProvider >
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* <GestureHandlerRootView style={{ flex: 1 }}> */}
         {/* <AuthProvider> */}
         <StatusBar style="dark" />
         <Slot />
-        <Toaster
+        {/* <Toaster
           toastOptions={{
             style: { backgroundColor: "#F2F5FA" },
           }}
           richColors
-        />
+        /> */}
         {/* </AuthProvider> */}
-      </GestureHandlerRootView>
+      {/* </GestureHandlerRootView> */}
     </SafeAreaProvider>
   );
 }
