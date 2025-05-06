@@ -2,7 +2,7 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Link, usePathname, useRouter } from "expo-router";
-import Colors from "../../constants/Colors";
+import Colors from "../constants/Colors";
 import { Feather } from "@expo/vector-icons";
 
 interface BottomNavItem {
