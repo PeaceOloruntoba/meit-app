@@ -25,19 +25,19 @@ const AppLayout = () => {
 
   const navigationItems = [
     {
-      href: "/search",
+      href: "app/search",
       icon: <Feather name="search" size={24} color={Colors.primary} />,
     },
     {
-      href: "/products",
+      href: "app/products",
       icon: <Feather name="grid" size={24} color={Colors.primary} />,
     },
     {
-      href: "/rentals",
+      href: "app/rentals",
       icon: <Feather name="list" size={24} color={Colors.primary} />,
     },
     {
-      href: "/profile",
+      href: "app/profile",
       icon: <Feather name="user" size={24} color={Colors.primary} />,
     },
   ];
