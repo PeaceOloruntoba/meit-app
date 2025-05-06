@@ -1,7 +1,8 @@
 import { Link } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { Button, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { toast } from "sonner-native";
 
 export default function Page() {
   return (
@@ -37,6 +38,10 @@ function Content() {
               >
                 Explore
               </Link>
+              <Button
+                title="Show Toast"
+                onPress={() => toast("Hello, World!")}
+              />
             </View>
           </View>
         </View>
