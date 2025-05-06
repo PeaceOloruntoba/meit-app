@@ -1,13 +1,35 @@
+import BottomNav from "@/components/BottomNav";
+import Colors from "@/constants/Colors";
+import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Page() {
+  const navigationItems = [
+    {
+      href: "/search",
+      icon: <Feather name="grid" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/products",
+      icon: <Feather name="search" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/overview",
+      icon: <Feather name="list" size={24} color={Colors.primary} />,
+    },
+    {
+      href: "/profile",
+      icon: <Feather name="user" size={24} color={Colors.primary} />,
+    },
+  ];
   return (
     <View className="flex flex-1">
       <Header />
       <Content />
+      <BottomNav items={navigationItems} />
       <Footer />
     </View>
   );
