@@ -12,7 +12,12 @@ export default function Layout() {
         {/* <AuthProvider> */}
         <StatusBar style="dark" />
         <Slot />
-        <Toaster richColors />
+        <Toaster
+          toastOptions={{
+            style: { backgroundColor: "#F2F5FA" },
+          }}
+          richColors
+        />
         {/* </AuthProvider> */}
       </GestureHandlerRootView>
     </SafeAreaProvider>
