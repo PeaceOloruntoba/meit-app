@@ -1,76 +1,121 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const ProfileScreen = () => {
+  // const { user, loading, error, logout } = useAuth();
   const router = useRouter();
-  const [searchText, setSearchText] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
 
-  const handleSearch = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log("Searching for:", searchText);
-    }, 1500);
-  };
-
-  const handleFilter = () => {
-    console.log("Navigating to filters");
-  };
-
-  const navigateToDetails = () => {
-    router.push("/pages/profile/edit-profile");
-  };
+//   if (loading) {
+//     return (
+//       <View className="flex-1 justify-center items-center">
+//         <Text className="text-lg">Profil wird geladen...</Text>
+//       </View>
+//     );
+//   }
+// 
+//   if (error) {
+//     return (
+//       <View className="flex-1 justify-center items-center">
+//         <Text className="text-red-500 text-lg">
+//           Fehler beim Laden des Profils: {error}
+//         </Text>
+//       </View>
+//     );
+//   }
+// 
+//   if (!user) {
+//     return (
+//       <View className="flex-1 justify-center items-center">
+//         <Text className="text-lg">Nicht angemeldet.</Text>
+//       </View>
+//     );
+//   }
 
   return (
-    <View className="flex-1 bg-background pt-20">
-      <View className="px-4 pt-6">
-        <View className="flex flex-row items-center space-x-2">
-          <View className="flex-1 bg-white rounded-lg shadow-sm">
-            <TextInput
-              className="w-full p-3 text-lg text-textPrimary"
-              placeholder="Suche..."
-              value={searchText}
-              onChangeText={setSearchText}
-              onSubmitEditing={handleSearch}
-            />
-          </View>
-          <TouchableOpacity
-            onPress={handleFilter}
-            className="bg-black rounded-lg p-3 ml-4 shadow-md"
-          >
-            <Feather name="filter" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
+    <View className="flex-1 bg-[#F2F5FA] p-4 pt-20 flex-col justify-between">
+      <View>
+        <TouchableOpacity
+          onPress={() => router.push("/edit-profile")}
+          style={styles.listItem}
+        >
+          <Text className="text-lg text-gray-800">Profil bearbeiten</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
 
-        {loading && (
-          <View className="mt-8 items-center">
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text className="mt-2 text-textSecondary">Searching...</Text>
-          </View>
-        )}
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle Impressum navigation */
+          }}
+          style={styles.listItem}
+        >
+          <Text className="text-lg text-gray-800">Impressum</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
 
-        <View className="mt-10 px-4">
-          <TouchableOpacity
-            onPress={navigateToDetails}
-            className="bg-gray-200 p-4 rounded-lg mb-4 items-center"
-          >
-            <Text className="text-lg font-bold">Go to Search Details (ID)</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle Rechtliches navigation */
+          }}
+          style={styles.listItem}
+        >
+          <Text className="text-lg text-gray-800">Rechtliches</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <TouchableOpacity style={styles.logoutButton}>
+          <Text className="text-lg text-red-600">Abmelden</Text>
+          <Feather name="chevron-right" size={20} color="#d32f2f" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle Account löschen */
+          }}
+          style={styles.deleteAccountButton}
+        >
+          <Text className="text-lg text-white">Account löschen</Text>
+          <Feather name="chevron-right" size={20} color="#fff" />
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  listItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#fff",
+    marginBottom: 1,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#d32f2f",
+    marginBottom: 6,
+    borderRadius: 10,
+  },
+  deleteAccountButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#d32f2f",
+    marginTop: 12,
+  },
+});
 
 export default ProfileScreen;
