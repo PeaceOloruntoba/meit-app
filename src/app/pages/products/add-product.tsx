@@ -44,12 +44,23 @@ const AddProductScreen = () => {
       setImageUrl(result.assets[0].uri);
     }
   };
+
+  const handleAdd = () => {
+    router.push("/pages/products");
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-background"
       keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
+      <TouchableOpacity
+        onPress={handleAdd}
+        className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
+      >
+        <Feather name="x" size={24} color="white" />
+      </TouchableOpacity>
       <ScrollView
         contentContainerStyle={{ padding: 16, paddingTop: 64, flexGrow: 1 }}
       >
@@ -265,7 +276,7 @@ const AddProductScreen = () => {
             console.log("Add product pressed");
             router.push("/pages/products");
           }}
-          className="bg-primary rounded-md p-4 mt-6 items-center"
+          className="bg-[primary] rounded-md p-4 mt-6 items-center"
         >
           <Text className="text-white text-lg font-bold">Speichern</Text>
         </TouchableOpacity>
