@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -21,7 +16,6 @@ const SearchDetailsScreen = () => {
   const blurhash =
     "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-
   return (
     <View className="flex-1 pt-20 items-center bg-primary px-4">
       <TouchableOpacity
@@ -37,14 +31,17 @@ const SearchDetailsScreen = () => {
         <Text className="text-textSecondary text-md mb-4">
           Vorname und Nachname
         </Text>
-        <Image
-          className="rounded-lg w-full aspect-video"
-          source={{ uri: carImageUrl }}
-        />
-        <Image
-          style={{ width: "100%", height: "100%", objectFit: "cover" }} // Explicit dimensions for testing
-          source={{uri: carImageUrl}} // Directly pass the URL string
-        />
+        <View className="rounded-lg overflow-hidden w-full aspect-video">
+          <Image
+            source={{ uri: carImageUrl }}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="contain"
+            placeholder={{
+              uri: carImageUrl,
+              blurhash: blurhash,
+            }}
+          />
+        </View>
         <View className="flex flex-col gap-2">
           <Text className="text-textPrimary text-lg font-bold mb-2">
             Beschreibung
