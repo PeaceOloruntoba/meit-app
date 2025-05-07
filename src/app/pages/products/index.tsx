@@ -1,20 +1,12 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  TextInput,
-  TouchableOpacity,
-  Image as RNImage,
-} from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 
 const SearchScreen = () => {
   const router = useRouter();
-  
+
   const carImageUrl =
     "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
 
