@@ -33,6 +33,10 @@ const ProfileScreen = () => {
   //     );
   //   }
 
+  const handleLogout = () => {
+    router.push("/auth/login");
+  };
+
   return (
     <View className="flex-1 bg-[#F2F5FA] p-4 pt-20 flex-col justify-between">
       <View>
@@ -66,7 +70,10 @@ const ProfileScreen = () => {
       </View>
 
       <View>
-        <TouchableOpacity className="flex-row items-center justify-between px-5 py-4 bg-white border border-[#d32f2f] mb-1 rounded-md">
+        <TouchableOpacity
+          className="flex-row items-center justify-between px-5 py-4 bg-white border border-[#d32f2f] mb-1 rounded-md"
+          onPress={handleLogout}
+        >
           <Text className="text-lg text-red-600">Abmelden</Text>
           <Feather name="chevron-right" size={20} color="#d32f2f" />
         </TouchableOpacity>
