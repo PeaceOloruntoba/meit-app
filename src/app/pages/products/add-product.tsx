@@ -45,7 +45,7 @@ const AddProductScreen = () => {
     }
   };
 
-  const handleAdd = () => {
+  const handleGoBack = () => {
     router.push("/pages/products");
   };
 
@@ -55,20 +55,14 @@ const AddProductScreen = () => {
       className="flex-1 bg-background"
       keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
-      <TouchableOpacity
-        onPress={handleAdd}
-        className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
-      >
-        <Feather name="x" size={24} color="white" />
-      </TouchableOpacity>
       <ScrollView
         contentContainerStyle={{ padding: 16, paddingTop: 64, flexGrow: 1 }}
       >
         <TouchableOpacity
           onPress={() => router.back()}
-          className="absolute top-4 right-4 bg-black rounded-md p-2 z-10"
+          className="absolute top-20 right-4 bg-black rounded-md p-2 z-10"
         >
-          <Text className="text-white text-lg font-bold">X</Text>
+          <Feather name="x" size={24} color="white" />
         </TouchableOpacity>
         <Text className="text-2xl font-bold mb-4 text-textPrimary">
           Produkt hinzufügen
