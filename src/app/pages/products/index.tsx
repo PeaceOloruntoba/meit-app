@@ -4,12 +4,12 @@ import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 
-const SearchScreen = () => {
+const ProductsScreen = () => {
   const router = useRouter();
 
   const carImageUrl =
     "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
-    
+
   const handleAdd = () => {
     router.push("/pages/products/add-product");
   };
@@ -61,4 +61,4 @@ const SearchScreen = () => {
   );
 };
 
-export default SearchScreen;
+export default ProductsScreen;
