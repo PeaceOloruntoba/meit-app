@@ -21,7 +21,7 @@ const ProductsScreen = () => {
   return (
     <View className="flex-1 bg-background pt-20">
       <View className="px-4 pt-6">
-        <View className="flex items-center absolute top-24 right-4">
+        <View className="flex items-center absolute right-4">
           <TouchableOpacity
             onPress={handleAdd}
             className="bg-black rounded-lg p-3 ml-4 shadow-md"
