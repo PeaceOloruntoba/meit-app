@@ -4,7 +4,7 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
-  Image as RNImage,
+  Image as RNImage, // Rename the built-in Image
 } from "react-native";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -13,8 +13,7 @@ import { Feather } from "@expo/vector-icons";
 const SearchDetailsScreen = () => {
   const router = useRouter();
   const carImageUrl =
-    "https://www.bing.com/images/search?view=detailV2&ccid=RRLRTfyo&id=887012984823F99E1CBC718189CCA3D53B93F5EA&thid=OIP.RRLRTfyovae8cElrahuPHwHaE8&mediaurl=https%3a%2f%2fwallpaperaccess.com%2ffull%2f2944739.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.4512d14dfca8bda7bc70496b6a1b8f1f%3frik%3d6vWTO9WjzImBcQ%26pid%3dImgRaw%26r%3d0&exph=2731&expw=4096&q=blue+bmw+car&simid=607988716754976946&FORM=IRPRST&ck=4E28E45B2FC51F5FB2C6DE645B22245D&selectedIndex=0&itb=0";
-
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Two_Blue_BMW_Z4_--_Flickr_--_exfordy.jpg/1280px-Two_Blue_BMW_Z4_--_Flickr_--_exfordy.jpg";
   const navigateToDetails = () => {
     router.push("/pages/search");
   };
@@ -34,8 +33,8 @@ const SearchDetailsScreen = () => {
         <Text className="text-textSecondary text-md mb-4">
           Vorname und Nachname
         </Text>
-        <RNImage
-          className="rounded-lg p-2"
+        <RNImage // Using the correctly imported Image component
+          className="rounded-lg w-full aspect-video" // Added width and aspect ratio
           source={{ uri: carImageUrl }}
           resizeMode="cover"
         />
@@ -44,7 +43,7 @@ const SearchDetailsScreen = () => {
             Beschreibung
           </Text>
           <Text className="text-textSecondary text-sm mb-4">
-            lddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddldddddddddddddddddddddddddddddddd
+            ldddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddldddddddddddddddddddddddddddddd
           </Text>
         </View>
         <View className="flex flex-col gap-2">
