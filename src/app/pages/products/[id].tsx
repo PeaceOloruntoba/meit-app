@@ -6,8 +6,10 @@ import { Feather } from "@expo/vector-icons";
 
 const ProductsDetailsScreen = () => {
   const router = useRouter();
+  
   const carImageUrl =
     "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
+
   const navigateToDetails = () => {
     router.push("/pages/products");
   };
