@@ -276,7 +276,7 @@ const AddProductScreen = () => {
             console.log("Add product pressed");
             router.push("/pages/products");
           }}
-          className="bg-[primary] rounded-md p-4 mt-6 items-center"
+          className="bg-[#7D7AFF] rounded-md p-4 mt-6 items-center"
         >
           <Text className="text-white text-lg font-bold">Speichern</Text>
         </TouchableOpacity>
