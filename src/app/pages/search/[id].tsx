@@ -4,8 +4,8 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
-  Image as RNImage, // Rename the built-in Image
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
@@ -13,10 +13,14 @@ import { Feather } from "@expo/vector-icons";
 const SearchDetailsScreen = () => {
   const router = useRouter();
   const carImageUrl =
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Two_Blue_BMW_Z4_--_Flickr_--_exfordy.jpg/1280px-Two_Blue_BMW_Z4_--_Flickr_--_exfordy.jpg";
+    "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
   const navigateToDetails = () => {
     router.push("/pages/search");
   };
+
+  const blurhash =
+    "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
+
 
   return (
     <View className="flex-1 pt-20 items-center bg-primary px-4">
@@ -33,10 +37,13 @@ const SearchDetailsScreen = () => {
         <Text className="text-textSecondary text-md mb-4">
           Vorname und Nachname
         </Text>
-        <RNImage // Using the correctly imported Image component
-          className="rounded-lg w-full aspect-video" // Added width and aspect ratio
+        <Image
+          className="rounded-lg w-full aspect-video"
           source={{ uri: carImageUrl }}
-          resizeMode="cover"
+        />
+        <Image
+          style={{ width: "100%", height: "100%", objectFit: "cover" }} // Explicit dimensions for testing
+          source={{uri: carImageUrl}} // Directly pass the URL string
         />
         <View className="flex flex-col gap-2">
           <Text className="text-textPrimary text-lg font-bold mb-2">

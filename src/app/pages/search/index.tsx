@@ -15,8 +15,7 @@ const SearchScreen = () => {
   const router = useRouter();
   const [searchText, setSearchText] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const carImageUrl =
-    "../../../assets/car.jpeg";
+  const carImageUrl = "https://picsum.photos/seed/696/3000/2000";
 
   const handleSearch = () => {
     setLoading(true);
