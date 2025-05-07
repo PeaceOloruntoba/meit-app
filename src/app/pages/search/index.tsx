@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
-  Image as RNImage, // Rename the built-in Image to avoid conflict
+  Image as RNImage,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -16,7 +16,7 @@ const SearchScreen = () => {
   const [searchText, setSearchText] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const carImageUrl =
-    "https://www.bing.com/images/search?view=detailV2&ccid=RRLRTfyo&id=887012984823F99E1CBC718189CCA3D53B93F5EA&thid=OIP.RRLRTfyovae8cElrahuPHwHaE8&mediaurl=https%3a%2f%2fwallpaperaccess.com%2ffull%2f2944739.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.4512d14dfca8bda7bc70496b6a1b8f1f%3frik%3d6vWTO9WjzImBcQ%26pid%3dImgRaw%26r%3d0&exph=2731&expw=4096&q=blue+bmw+car&simid=607988716754976946&FORM=IRPRST&ck=4E28E45B2FC51F5FB2C6DE645B22245D&selectedIndex=0&itb=0";
+    "../../../assets/car.jpeg";
 
   const handleSearch = () => {
     setLoading(true);
