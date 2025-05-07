@@ -1,8 +1,7 @@
 import React from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 
 const ProductsDetailsScreen = () => {
