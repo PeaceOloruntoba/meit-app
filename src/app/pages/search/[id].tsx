@@ -27,7 +27,7 @@ const SearchDetailsScreen = () => {
       >
         <Feather name="x" size={24} color="white" />
       </TouchableOpacity>
-      <View className="flex-1 items-start w-full">
+      <View className="flex-1 items-start w-full gap-4">
         <Text className="text-textPrimary text-3xl font-bold mb-4">
           Produktname
         </Text>
@@ -35,11 +35,91 @@ const SearchDetailsScreen = () => {
           Vorname und Nachname
         </Text>
         <RNImage
-          className="rounded-lg"
+          className="rounded-lg p-2"
           source={{ uri: carImageUrl }}
           resizeMode="cover"
         />
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <View className="flex flex-col gap-2">
+          <Text className="text-textPrimary text-lg font-bold mb-2">
+            Beschreibung
+          </Text>
+          <Text className="text-textSecondary text-sm mb-4">
+            lddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddlddddddddddddddddddddddddddddddddddddddddddddldddddddddddddddddddddddddddddddd
+          </Text>
+        </View>
+        <View className="flex flex-col gap-2">
+          <Text className="text-textPrimary text-lg font-bold mb-2">Daten</Text>
+          <View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                Preis
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">
+                36,00 € pro Tag
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                Lieferpreis
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">36,00 €</Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                Kaution
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">36,00 €</Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                Startdatum
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">
+                04.08.2025
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                Enddatum
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">
+                04.12.2025
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                E-Mail
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">
+                kumar.davidthiben@gmail.com
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                Website
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">
+                https://www.google.de
+              </Text>
+            </View>
+            <View className="flex flex-row justify-between w-full">
+              <Text className="text-textSecondary text-sm mb-4 font-semibold">
+                WhatsApp
+              </Text>
+              <Text className="text-textSecondary text-sm mb-4">
+                +4917641474606
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View className="flex flex-col gap-2">
+          <Text className="text-textPrimary text-lg font-bold mb-2">
+            Standort
+          </Text>
+          <Text className="text-textSecondary text-sm mb-4">
+            Musterstraße, 53474 Ahrweiler
+          </Text>
+        </View>
       </View>
     </View>
   );
