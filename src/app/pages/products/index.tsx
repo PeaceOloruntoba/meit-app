@@ -9,10 +9,7 @@ const SearchScreen = () => {
 
   const carImageUrl =
     "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
-
-  const blurhash =
-    "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
-
+    
   const handleAdd = () => {
     router.push("/pages/products/add-product");
   };
@@ -44,7 +41,6 @@ const SearchScreen = () => {
                 contentFit="contain"
                 placeholder={{
                   uri: carImageUrl,
-                  blurhash: blurhash,
                 }}
               />
             </View>
