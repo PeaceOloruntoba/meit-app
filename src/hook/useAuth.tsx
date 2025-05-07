@@ -7,6 +7,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { toast } from "sonner-native";
+import { doc, setDoc } from "firebase/firestore";
 
 const AuthContext = createContext(null);
 
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe(); // Cleanup the listener
   }, []);
 
-  const register = async (email, password) => {
+  const register = async (email, password, additionalData) => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -31,7 +32,14 @@ export const AuthProvider = ({ children }) => {
         email,
         password
       );
+      const { uid } = userCredential.user;
       setUser(userCredential.user);
+
+      await setDoc(doc(db, "users", uid), {
+        email: email,
+        createdAt: new Date(),
+      });
+
       toast.success("Registration successful!");
     } catch (error) {
       console.error("Registration error:", error.message);
