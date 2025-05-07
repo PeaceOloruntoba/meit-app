@@ -10,12 +10,17 @@ import {
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
+import { Image } from "expo-image";
 
 const SearchScreen = () => {
   const router = useRouter();
   const [searchText, setSearchText] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const carImageUrl = "https://picsum.photos/seed/696/3000/2000";
+  const carImageUrl =
+    "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
+
+  const blurhash =
+    "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
   const handleSearch = () => {
     setLoading(true);
@@ -66,11 +71,15 @@ const SearchScreen = () => {
             onPress={navigateToDetails}
             className="bg-white shadow-md shadow-black/70 p-4 rounded-lg mb-4 items-center flex flex-row items-center space-x-2"
           >
-            <View className="rounded-lg h-24 overflow-hidden">
-              <RNImage
-                className="rounded-lg"
+            <View className="rounded-lg overflow-hidden w-20 aspect-video">
+              <Image
                 source={{ uri: carImageUrl }}
-                resizeMode="cover"
+                style={{ width: "100%", height: "100%" }}
+                contentFit="contain"
+                placeholder={{
+                  uri: carImageUrl,
+                  blurhash: blurhash,
+                }}
               />
             </View>
             <View className="flex flex-col">
