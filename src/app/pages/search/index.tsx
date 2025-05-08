@@ -26,7 +26,7 @@ const SearchScreen = () => {
     if (searchText) {
       const results = products.filter(
         (product) =>
-          product.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          product.name?.toLowerCase().includes(searchText.toLowerCase()) ||
           product.description?.toLowerCase().includes(searchText.toLowerCase())
       );
       setSearchResults(results);
