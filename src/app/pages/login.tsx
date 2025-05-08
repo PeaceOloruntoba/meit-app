@@ -84,7 +84,7 @@ const LoginScreen = () => {
 
       <Text className="text-gray-500">
         Du hast keine Account?{" "}
-        <Link href="/auth/register" className="text-[#7C5CFC] font-semibold">
+        <Link href="/pages/register" className="text-[#7C5CFC] font-semibold">
           Jetzt Registrieren
         </Link>
       </Text>

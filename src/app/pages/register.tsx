@@ -218,7 +218,7 @@ const RegisterScreen = () => {
 
       <Text className="text-gray-500 mt-4">
         Hast du bereits ein Konto?{" "}
-        <Link href="/(auth)/login" className="text-[#7C5CFC] font-semibold">
+        <Link href="/pages/login" className="text-[#7C5CFC] font-semibold">
           Anmelden
         </Link>
       </Text>
