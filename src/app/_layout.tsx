@@ -24,7 +24,7 @@ export default function Layout() {
       icon: <Feather name="list" size={24} color={Colors.primary} />,
     },
     {
-      href: "/pages/login",
+      href: "/pages/profile",
       icon: <Feather name="user" size={24} color={Colors.primary} />,
     },
   ];
