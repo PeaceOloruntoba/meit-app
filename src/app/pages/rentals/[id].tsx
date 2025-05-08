@@ -14,7 +14,7 @@ interface RentalDetailsParams {
 
 const RentalDetailsScreen = () => {
   const router = useRouter();
-  const rentalId = useLocalSearchParams(); // Get the params object
+  const rentalId = useLocalSearchParams<RentalDetailsParams>();
   const {
     rental,
     loading: rentalLoading,
@@ -39,11 +39,9 @@ const RentalDetailsScreen = () => {
     email?: string;
   } | null>(null);
 
-  useEffect(() => {
-    if (rentalId && typeof rentalId === "object" && "id" in rentalId) {
-      getRentalById(rentalId.id as string); // Type assertion to string
-    }
-  }, [getRentalById, rentalId]);
+  if (rentalId) {
+    getRentalById(rentalId.id); // Type assertion to string
+  }
 
   useEffect(() => {
     if (rental?.productId) {

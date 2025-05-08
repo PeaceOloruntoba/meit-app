@@ -61,13 +61,13 @@ const RentalScreen = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <View className="flex-1 bg-background pt-20 justify-center items-center">
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View className="flex-1 bg-background pt-20 justify-center items-center">
+  //       <ActivityIndicator size="large" />
+  //     </View>
+  //   );
+  // }
 
   if (error) {
     return (

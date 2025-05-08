@@ -1,24 +1,63 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"; // Import useState
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
-import { useProduct } from "@/hook/useProduct"; // Import the hook
+import { useProduct } from "@/hook/useProduct";
+import { useAuth } from "@/hook/useAuth"; // Import useAuth
+import { useRental } from "@/hook/useRentals"; // Import useRental
 
 const SearchDetailsScreen = () => {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { product, loading, error, getSingleProduct } = useProduct();
+  const { id: productId } = useLocalSearchParams<{ id: string }>(); // Rename id to productId for clarity
+  const {
+    product,
+    loading: productLoading,
+    error: productError,
+    getSingleProduct,
+  } = useProduct();
+  const { user } = useAuth(); // Get the current user
+  const {
+    createRental,
+    loading: rentalLoading,
+    error: rentalError,
+  } = useRental(); // Get the createRental function
+  const [isRenting, setIsRenting] = useState(false); // State to manage the renting process
 
   useEffect(() => {
-    if (id) {
-      getSingleProduct(id);
+    if (productId) {
+      getSingleProduct(productId);
     }
-  }, [getSingleProduct, id]);
+  }, [getSingleProduct, productId]);
 
-  const navigateToDetails = () => {
+  const navigateToSearch = () => {
     router.push("/pages/search");
+  };
+
+  const handleRentProduct = async () => {
+    if (!user?.uid) {
+      // Handle unauthenticated user (e.g., redirect to login)
+      router.push("/pages/login");
+      return;
+    }
+
+    if (!product) {
+      // Handle case where product data is not yet loaded
+      return;
+    }
+
+    setIsRenting(true);
+    const rentalId = await createRental(
+      productId,
+      product.userId,
+      product.price
+    );
+    setIsRenting(false);
+
+    if (rentalId) {
+      router.push(`/pages/rentals/${rentalId}`);
+    }
   };
 
   const carImageUrl =
@@ -27,7 +66,7 @@ const SearchDetailsScreen = () => {
   const blurhash =
     "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-  if (loading) {
+  if (productLoading || rentalLoading) {
     return (
       <View className="flex-1 items-center bg-primary justify-center">
         <ActivityIndicator size="large" color={Colors.primary} />
@@ -35,11 +74,11 @@ const SearchDetailsScreen = () => {
     );
   }
 
-  if (error) {
+  if (productError || rentalError) {
     return (
       <View className="flex-1 items-center bg-primary justify-center">
         <Text className="text-red-500">
-          Fehler beim Laden des Produkts: {error}
+          Fehler beim Laden: {productError || rentalError}
         </Text>
       </View>
     );
@@ -54,10 +93,10 @@ const SearchDetailsScreen = () => {
   }
 
   return (
-    <View className="flex-1 items-center bg-primary px-4">
+    <View className="flex-1 items-center bg-primary p-4">
       <TouchableOpacity
-        onPress={navigateToDetails}
-        className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
+        onPress={navigateToSearch}
+        className="bg-black rounded-lg p-3 shadow-md absolute top-2 right-4"
       >
         <Feather name="x" size={24} color="white" />
       </TouchableOpacity>
@@ -178,7 +217,17 @@ const SearchDetailsScreen = () => {
             </Text>
           </View>
         )}
-        {/* Renting button will be implemented later */}
+        <TouchableOpacity
+          onPress={handleRentProduct}
+          className={`bg-indigo-600 py-3 rounded-lg w-full items-center justify-center ${
+            isRenting ? "opacity-70" : ""
+          }`}
+          disabled={isRenting}
+        >
+          <Text className="text-white font-bold text-lg">
+            {isRenting ? "Mieten..." : "Mieten"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

@@ -59,6 +59,7 @@ export const useRental = () => {
         setLoading(false);
         return docRef.id;
       } catch (e: any) {
+        console.log(e)
         setError(e.message || "Failed to create rental");
         toast.error(`Fehler beim Senden der Mietanfrage: ${e.message}`);
         setLoading(false);

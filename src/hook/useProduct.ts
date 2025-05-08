@@ -31,7 +31,7 @@ interface Product {
   contactWebsite?: string;
   contactWhatsApp?: string;
   location?: string;
-  userId: string; // To store the user who added the product
+  userId: string;
 }
 
 const productsCollection = collection(db, "products");
@@ -63,6 +63,7 @@ export const useProduct = () => {
         return docRef.id;
       } catch (e: any) {
         setError(e.message || "Failed to add product");
+        console.log(e)
         toast.error(`Fehler beim Hinzufügen des Produkts: ${e.message}`);
         setLoading(false);
         return null;
