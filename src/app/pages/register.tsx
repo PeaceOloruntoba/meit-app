@@ -1,9 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import { Link } from "expo-router";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import { Link, useRouter } from "expo-router";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { toast } from "sonner-native";
+import { useAuth } from "@/hook/useAuth"; // Import useAuth and useRouter
 
 const RegisterScreen = () => {
   const [lastName, setLastName] = useState("");
@@ -18,11 +26,13 @@ const RegisterScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agbChecked, setAgbChecked] = useState(false);
   const [privacyChecked, setPrivacyChecked] = useState(false);
+  const { register, loading } = useAuth(); // Get register function and loading state
+  const router = useRouter(); // Get the router
 
   const pickImage = async (setImageState: (uri: string | null) => void) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to upload images!");
+      toast.error("Berechtigung für Kamerazugriff verweigert!");
       return;
     }
 
@@ -47,16 +57,34 @@ const RegisterScreen = () => {
       toast.error("Passwörter stimmen nicht überein!");
       return;
     }
+    if (!email || !password || !firstName || !lastName) {
+      toast.error("Bitte fülle alle erforderlichen Felder aus.");
+      return;
+    }
+    if (!idFrontImage || !idBackImage) {
+      toast.error(
+        "Bitte lade Bilder von der Vorder- und Rückseite deines Ausweises hoch."
+      );
+      return;
+    }
 
     const additionalData = {
       lastName,
       firstName,
       address,
       taxId,
-      idFrontImage,
-      idBackImage,
+      idFrontImageUrl: idFrontImage, // Consider uploading to storage for real apps
+      idBackImageUrl: idBackImage, // Consider uploading to storage for real apps
       whatsappNumber: phoneNumber, // Assuming phoneNumber is for WhatsApp
     };
+
+    await register(email, password, additionalData); // Call the register function
+
+    // The register function in your hook should handle success/error toasts
+    // and potentially navigation. If not, you can add navigation here:
+    // if (!loading && !error) {
+    //   router.replace("/pages/login"); // Redirect on successful registration
+    // }
   };
 
   return (
@@ -200,20 +228,29 @@ const RegisterScreen = () => {
       <TouchableOpacity
         onPress={handleRegister}
         disabled={
-          //  loading ||
-          !agbChecked || !privacyChecked || !idFrontImage || !idBackImage
+          loading ||
+          !agbChecked ||
+          !privacyChecked ||
+          !idFrontImage ||
+          !idBackImage
         }
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
-          //  loading ||
-          !agbChecked || !privacyChecked || !idFrontImage || !idBackImage
+          loading ||
+          !agbChecked ||
+          !privacyChecked ||
+          !idFrontImage ||
+          !idBackImage
             ? "opacity-50"
             : ""
         }`}
       >
-        {/* <Text className="text-white font-semibold text-base">
-          {loading ? "Registrieren..." : "Jetzt registrieren"}
-        </Text> */}
-        <Text>Jetzt registrieren</Text>
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text className="text-white font-semibold text-base">
+            Jetzt registrieren
+          </Text>
+        )}
       </TouchableOpacity>
 
       <Text className="text-gray-500 mt-4">
