@@ -2,39 +2,40 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { useAuth } from "@/hook/useAuth";
+import { toast } from "sonner-native"; // Import toast
 
 const ProfileScreen = () => {
-  // const { user, loading, error, logout } = useAuth();
+  const { user, loading, error, logout } = useAuth();
   const router = useRouter();
 
-  //   if (loading) {
-  //     return (
-  //       <View className="flex-1 justify-center items-center">
-  //         <Text className="text-lg">Profil wird geladen...</Text>
-  //       </View>
-  //     );
-  //   }
-  //
-  //   if (error) {
-  //     return (
-  //       <View className="flex-1 justify-center items-center">
-  //         <Text className="text-red-500 text-lg">
-  //           Fehler beim Laden des Profils: {error}
-  //         </Text>
-  //       </View>
-  //     );
-  //   }
-  //
-  //   if (!user) {
-  //     return (
-  //       <View className="flex-1 justify-center items-center">
-  //         <Text className="text-lg">Nicht angemeldet.</Text>
-  //       </View>
-  //     );
-  //   }
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-lg">Profil wird geladen...</Text>
+      </View>
+    );
+  }
 
-  const handleLogout = () => {
+  if (error) {
+    toast.error("Error: ", error);
+  }
+
+  if (!user) {
+    toast.error("Unauthorised!!!");
     router.push("/pages/login");
+    return;
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Erfolgreich abgemeldet!");
+      // The AuthProvider should handle redirecting to the login screen
+    } catch (err: any) {
+      console.error("Logout error:", err.message);
+      toast.error(`Abmeldung fehlgeschlagen: ${err.message}`);
+    }
   };
 
   return (

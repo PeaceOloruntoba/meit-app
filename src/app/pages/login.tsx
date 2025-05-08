@@ -4,16 +4,16 @@ import { Link, useRouter } from "expo-router";
 import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { toast } from "sonner-native";
-// import { useAuth } from "@/hook/useAuth";
+import { useAuth } from "@/hook/useAuth";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const { login, loading } = useAuth();
+  const { login, loading } = useAuth();
   const router = useRouter();
 
   const handleLogin = async () => {
-    // await login(email, password);
+    await login(email, password);
   };
 
   return (
@@ -47,7 +47,7 @@ const LoginScreen = () => {
         </Text>
       </TouchableOpacity>
 
-      {/* <TouchableOpacity
+      <TouchableOpacity
         onPress={handleLogin}
         disabled={loading}
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-8 ${
@@ -59,7 +59,7 @@ const LoginScreen = () => {
         ) : (
           <Text className="text-white font-semibold text-base">Einloggen</Text>
         )}
-      </TouchableOpacity> */}
+      </TouchableOpacity>
       <View className="flex-row items-center mb-6 w-full">
         <View className="flex-1 h-px bg-gray-300" />
         <Text className="mx-4 text-gray-400">Oder Login mit</Text>
