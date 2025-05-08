@@ -1,13 +1,14 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { auth } from "../../firebaseConfig";
+import { auth, db } from "../../firebaseConfig"; // Import your db instance
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updateProfile as firebaseUpdateProfile, // Alias to avoid naming conflict
 } from "firebase/auth";
 import { toast } from "sonner-native";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext(null);
 
@@ -16,8 +17,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      setUser(authUser);
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        const userDocRef = doc(db, "users", authUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setUser({ ...authUser, ...userDocSnap.data() }); // Merge Firebase Auth user with Firestore data
+        } else {
+          setUser(authUser); // User exists in Firebase Auth but not yet in Firestore
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -33,12 +44,32 @@ export const AuthProvider = ({ children }) => {
         password
       );
       const { uid } = userCredential.user;
-      setUser(userCredential.user);
 
+      // Store additional user data in the 'users' collection
       await setDoc(doc(db, "users", uid), {
+        uid: uid,
         email: email,
         createdAt: new Date(),
+        ...additionalData, // Include the additional data passed from the registration form
       });
+
+      // Optionally update the user's display name in Firebase Auth
+      if (additionalData?.firstName || additionalData?.lastName) {
+        await firebaseUpdateProfile(userCredential.user, {
+          displayName: `${additionalData.firstName || ""} ${
+            additionalData.lastName || ""
+          }`.trim(),
+        });
+      }
+
+      // Fetch the newly created user document and update the state
+      const userDocRef = doc(db, "users", uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        setUser({ ...userCredential.user, ...userDocSnap.data() });
+      } else {
+        setUser(userCredential.user);
+      }
 
       toast.success("Registration successful!");
     } catch (error) {
@@ -57,7 +88,14 @@ export const AuthProvider = ({ children }) => {
         email,
         password
       );
-      setUser(userCredential.user);
+      const { uid } = userCredential.user;
+      const userDocRef = doc(db, "users", uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        setUser({ ...userCredential.user, ...userDocSnap.data() });
+      } else {
+        setUser(userCredential.user);
+      }
       toast.success("Login successful!");
     } catch (error) {
       console.error("Login error:", error.message);
@@ -81,8 +119,41 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Function to update the user's profile data in Firestore
+  const updateProfile = async (uid, updatedData) => {
+    setLoading(true);
+    try {
+      const userDocRef = doc(db, "users", uid);
+      await setDoc(userDocRef, updatedData, { merge: true }); // Use merge to update specific fields
+
+      // Optionally update the user's display name in Firebase Auth if firstName or lastName is updated
+      if (updatedData?.firstName || updatedData?.lastName) {
+        const currentAuthUser = auth.currentUser;
+        if (currentAuthUser) {
+          await firebaseUpdateProfile(currentAuthUser, {
+            displayName: `${updatedData.firstName || ""} ${
+              updatedData.lastName || ""
+            }`.trim(),
+          });
+        }
+      }
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        setUser({ ...auth.currentUser, ...userDocSnap.data() });
+        toast.success("Profile updated successfully!");
+      }
+    } catch (error) {
+      console.error("Update profile error:", error.message);
+      toast.error(`Failed to update profile: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, register, login, logout, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

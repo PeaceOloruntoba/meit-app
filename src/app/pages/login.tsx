@@ -1,4 +1,3 @@
-// /auth/login.js
 import React, { useState } from "react";
 import {
   View,
@@ -12,7 +11,7 @@ import { Link, useRouter } from "expo-router";
 import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
 import { useAuth } from "@/hook/useAuth";
 
-const LoginScreen: React.FC = () => {
+const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, loading } = useAuth();
