@@ -1,19 +1,11 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-} from "react-native";
-import { Link, useRouter } from "expo-router";
+import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import { Link } from "expo-router";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { toast } from "sonner-native";
-import { useAuth } from "@/hook/useAuth";
 
-const RegisterScreen: React.FC = () => {
+const RegisterScreen = () => {
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,13 +18,11 @@ const RegisterScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agbChecked, setAgbChecked] = useState(false);
   const [privacyChecked, setPrivacyChecked] = useState(false);
-  const { register, loading } = useAuth();
-  const router = useRouter();
 
   const pickImage = async (setImageState: (uri: string | null) => void) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      toast.error("Sorry, we need camera roll permissions to upload images!");
+      alert("Sorry, we need camera roll permissions to upload images!");
       return;
     }
 
@@ -65,10 +55,8 @@ const RegisterScreen: React.FC = () => {
       taxId,
       idFrontImage,
       idBackImage,
-      whatsappNumber: phoneNumber,
+      whatsappNumber: phoneNumber, // Assuming phoneNumber is for WhatsApp
     };
-
-    await register(email, password);
   };
 
   return (
@@ -99,7 +87,6 @@ const RegisterScreen: React.FC = () => {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
-          autoCapitalize="none"
         />
         <View className="absolute left-3 top-3">
           <FontAwesome name="envelope-o" size={20} color="gray" />
@@ -213,34 +200,25 @@ const RegisterScreen: React.FC = () => {
       <TouchableOpacity
         onPress={handleRegister}
         disabled={
-          loading ||
-          !agbChecked ||
-          !privacyChecked ||
-          !idFrontImage ||
-          !idBackImage
+          //  loading ||
+          !agbChecked || !privacyChecked || !idFrontImage || !idBackImage
         }
         className={`w-full bg-[#7C5CFC] p-4 rounded-xl items-center mb-4 ${
-          loading ||
-          !agbChecked ||
-          !privacyChecked ||
-          !idFrontImage ||
-          !idBackImage
+          //  loading ||
+          !agbChecked || !privacyChecked || !idFrontImage || !idBackImage
             ? "opacity-50"
             : ""
         }`}
       >
-        {loading ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text className="text-white font-semibold text-base">
-            Jetzt registrieren
-          </Text>
-        )}
+        {/* <Text className="text-white font-semibold text-base">
+          {loading ? "Registrieren..." : "Jetzt registrieren"}
+        </Text> */}
+        Jetzt registrieren
       </TouchableOpacity>
 
       <Text className="text-gray-500 mt-4">
         Hast du bereits ein Konto?{" "}
-        <Link href="/auth/login" className="text-[#7C5CFC] font-semibold">
+        <Link href="/(auth)/login" className="text-[#7C5CFC] font-semibold">
           Anmelden
         </Link>
       </Text>
