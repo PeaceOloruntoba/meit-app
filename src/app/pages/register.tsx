@@ -1,4 +1,3 @@
-// /auth/register.js
 import React, { useState } from "react";
 import {
   View,
@@ -14,7 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import { toast } from "sonner-native";
 import { useAuth } from "@/hook/useAuth";
 
-const RegisterForm: React.FC = () => {
+const RegisterScreen: React.FC = () => {
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -249,4 +248,4 @@ const RegisterForm: React.FC = () => {
   );
 };
 
-export default RegisterForm;
+export default RegisterScreen;
