@@ -12,12 +12,30 @@ import { AuthProvider, useAuth } from "@/hook/useAuth";
 import { ActivityIndicator, View } from "react-native";
 
 export default function Layout() {
+  return (
+    <SafeAreaProvider style={{ backgroundColor: Colors.background }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <AuthLayoutContent />
+          <Toaster
+            toastOptions={{
+              style: { backgroundColor: "#F2F5FA" },
+            }}
+            richColors
+          />
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
+  );
+}
+
+const AuthLayoutContent = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/auth/login");
+      router.replace("/pages/login");
     }
   }, [user, loading, router]);
 
@@ -45,29 +63,17 @@ export default function Layout() {
 
   if (loading) {
     return (
-      <SafeAreaProvider style={{ backgroundColor: Colors.background }}>
-        <View className="flex-1 justify-center items-center bg-white">
-          <ActivityIndicator size="large" color={Colors.primary} />
-        </View>
-      </SafeAreaProvider>
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
     );
   }
 
   return (
-    <SafeAreaProvider style={{ backgroundColor: Colors.background }}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <AuthProvider>
-          <StatusBar style="dark" backgroundColor={Colors.background} />
-          <Slot />
-          {user && !isAuthRoute ? <BottomNav items={navigationItems} /> : null}
-          <Toaster
-            toastOptions={{
-              style: { backgroundColor: "#F2F5FA" },
-            }}
-            richColors
-          />
-        </AuthProvider>
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
+    <>
+      <StatusBar style="dark" backgroundColor={Colors.background} />
+      <Slot />
+      {user && !isAuthRoute ? <BottomNav items={navigationItems} /> : null}
+    </>
   );
-}
+};
