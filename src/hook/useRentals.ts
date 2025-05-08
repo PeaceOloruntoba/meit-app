@@ -10,19 +10,20 @@ import {
   query,
   where,
   FieldValue,
+  serverTimestamp,
 } from "firebase/firestore";
 import { toast } from "sonner-native";
 import { db } from "firebaseConfig";
 
 interface Rental {
   id?: string;
-  userId: string; // User who created the rental
-  productId: string; // ID of the rented product
-  ownerId: string; // ID of the user who owns the product
-  price: number; // Rental price
+  userId: string;
+  productId: string;
+  ownerId: string;
+  price: number;
   paymentStatus: "paid" | "unpaid";
   rentalStatus: "pending" | "cancelled" | "success" | "ongoing";
-  createdAt: FieldValue; // Timestamp of when the rental was created
+  createdAt: FieldValue;
 }
 
 const rentalsCollection = collection(db, "rentals");
@@ -52,7 +53,7 @@ export const useRental = () => {
           price,
           paymentStatus: "unpaid",
           rentalStatus: "pending",
-          createdAt: FieldValue.serverTimestamp(),
+          createdAt: serverTimestamp(),
         });
         toast.success("Anfrage zum Mieten gesendet!");
         setLoading(false);
@@ -156,7 +157,6 @@ export const useRental = () => {
     }
   }, []);
 
-  // Function to get a single rental by ID (you might need to populate user and product data separately)
   const getRentalById = useCallback(async (rentalId: string) => {
     setLoading(true);
     setError(null);
