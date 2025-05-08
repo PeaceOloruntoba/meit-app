@@ -123,6 +123,19 @@ const SearchDetailsScreen = () => {
             Musterstraße, 53474 Ahrweiler
           </Text>
         </View>
+        {/* <TouchableOpacity
+          onPress={handleRentProduct}
+          className={`bg-[#7D7AFF] rounded-md p-4 mt-6 items-center ${
+            loading ? "opacity-50" : ""
+          }`}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-lg font-bold">Speichern</Text>
+          )}
+        </TouchableOpacity> */}
       </View>
     </View>
   );
