@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner-native";
 import { db } from "firebaseConfig";
 
-interface Rental {
+export interface Rental {
   id?: string;
   userId: string;
   productId: string;

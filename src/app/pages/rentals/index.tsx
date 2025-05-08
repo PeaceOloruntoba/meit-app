@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { useRental } from "@/hook/useRentals";
 import { useAuth } from "@/hook/useAuth";
+import { Rental as RentalType } from "@/hook/useRentals";
 
 const RentalScreen = () => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const RentalScreen = () => {
     router.push(`/pages/rentals/${rentalId}`);
   };
 
-  const getStatusColor = (status: Rental["rentalStatus"]) => {
+  const getStatusColor = (status: RentalType["rentalStatus"]) => {
     switch (status) {
       case "success":
         return "bg-green-200 text-green-800";
@@ -45,7 +46,7 @@ const RentalScreen = () => {
     }
   };
 
-  const getStatusIcon = (status: Rental["rentalStatus"]) => {
+  const getStatusIcon = (status: RentalType["rentalStatus"]) => {
     switch (status) {
       case "success":
         return "check-circle";
@@ -54,7 +55,7 @@ const RentalScreen = () => {
       case "pending":
         return "clock-o";
       case "cancelled":
-        return "x-circle";
+        return "repeat";
       default:
         return "question-circle";
     }
