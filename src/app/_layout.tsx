@@ -45,9 +45,11 @@ export default function Layout() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
+      <SafeAreaProvider style={{ backgroundColor: Colors.background }}>
+        <View className="flex-1 justify-center items-center bg-white">
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
