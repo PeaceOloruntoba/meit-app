@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }) => {
       const userDocSnap = await getDoc(userDocRef);
       if (userDocSnap.exists()) {
         setUser({ ...auth.currentUser, ...userDocSnap.data() });
-        toast.success("Profile updated successfully!");
+        // toast.success("Profile updated successfully!");
       }
     } catch (error) {
       console.error("Update profile error:", error.message);
