@@ -94,11 +94,11 @@ const AddProductScreen = () => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingTop: 64, flexGrow: 1 }}
+        contentContainerStyle={{ padding: 16, flexGrow: 1 }}
       >
         <TouchableOpacity
           onPress={() => router.back()}
-          className="absolute top-20 right-4 bg-black rounded-md p-2 z-10"
+          className="absolute top-2 right-4 bg-black rounded-md p-2 z-10"
         >
           <Feather name="x" size={24} color="white" />
         </TouchableOpacity>

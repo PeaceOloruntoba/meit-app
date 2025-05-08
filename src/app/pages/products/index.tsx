@@ -30,7 +30,7 @@ const ProductsScreen = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-background pt-20 justify-center items-center">
+      <View className="flex-1 bg-background justify-center items-center">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -38,7 +38,7 @@ const ProductsScreen = () => {
 
   if (error) {
     return (
-      <View className="flex-1 bg-background pt-20 justify-center items-center">
+      <View className="flex-1 bg-background justify-center items-center">
         <Text className="text-red-500">
           Fehler beim Laden der Produkte: {error}
         </Text>
@@ -47,9 +47,9 @@ const ProductsScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-background pt-20">
+    <View className="flex-1 bg-background">
       <View className="px-4 pt-6">
-        <View className="flex items-center absolute right-4">
+        <View className="flex items-center absolute right-4 top-1">
           <TouchableOpacity
             onPress={handleAdd}
             className="bg-black rounded-lg p-3 ml-4 shadow-md"

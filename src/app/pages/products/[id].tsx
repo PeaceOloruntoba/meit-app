@@ -28,7 +28,7 @@ const ProductsDetailsScreen = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 pt-20 items-center bg-primary justify-center">
+      <View className="flex-1 items-center bg-primary justify-center">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -36,7 +36,7 @@ const ProductsDetailsScreen = () => {
 
   if (error) {
     return (
-      <View className="flex-1 pt-20 items-center bg-primary justify-center">
+      <View className="flex-1 items-center bg-primary justify-center">
         <Text className="text-red-500">
           Fehler beim Laden des Produkts: {error}
         </Text>
@@ -46,17 +46,17 @@ const ProductsDetailsScreen = () => {
 
   if (!product) {
     return (
-      <View className="flex-1 pt-20 items-center bg-primary justify-center">
+      <View className="flex-1 items-center bg-primary justify-center">
         <Text className="text-gray-500">Produkt nicht gefunden.</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 pt-20 items-center bg-primary px-4">
+    <View className="flex-1 items-center bg-primary px-4">
       <TouchableOpacity
         onPress={navigateToDetails}
-        className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
+        className="bg-black rounded-lg p-3 shadow-md absolute top-2 right-4"
       >
         <Feather name="x" size={24} color="white" />
       </TouchableOpacity>
