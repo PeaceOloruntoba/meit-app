@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-// import { useAuth } from "../hooks/useAuth";
 import * as ImagePicker from "expo-image-picker";
+import { toast } from "sonner-native";
+import { useAuth } from "@/hook/useAuth"; // Import useAuth
 
 const EditProfileScreen = () => {
+  const { user, loading: authLoading, updateProfile } = useAuth(); // Get user and updateProfile
   const router = useRouter();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState(""); // Keep email for display
@@ -20,8 +23,20 @@ const EditProfileScreen = () => {
   const [frontIdImage, setFrontIdImage] = useState<string | null>(null);
   const [backIdImage, setBackIdImage] = useState<string | null>(null);
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Local loading state
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || "");
+      setEmail(user.email);
+      setAddress(user.address || "");
+      setTaxId(user.taxId || "");
+      setWhatsappNumber(user.whatsappNumber || "");
+      //  setFrontIdImage(user.frontIdImage || null); // Load from user data if available
+      //  setBackIdImage(user.backIdImage || null);   // Load from user data if available
+    }
+  }, [user]);
 
   const pickImage = async (type: "front" | "back") => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -46,26 +61,34 @@ const EditProfileScreen = () => {
     setError(null);
 
     try {
-      // if (displayName !== user?.displayName) {
-      //   await updateUserProfile(displayName);
-      // }
-
-      // TODO: Implement saving other profile data (address, taxId, images, phone)
-      console.log("Saving additional profile data:", {
+      const updatedData = {
+        displayName,
         address,
         taxId,
-        frontIdImage,
-        backIdImage,
         whatsappNumber,
-      });
+        //  frontIdImageUrl: frontIdImage,  //  upload and get url
+        //  backIdImageUrl: backIdImage,    // upload and get url
+      };
 
-      setLoading(false);
+      await updateProfile(user.uid, updatedData); // Call updateProfile from hook
+      // toast.success("Profil erfolgreich aktualisiert!");
       router.back();
     } catch (err: any) {
       setError(err.message || "Fehler beim Speichern des Profils.");
+      toast.error(`Profilaktualisierung fehlgeschlagen: ${err.message}`);
+    } finally {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-[#F2F5FA]">
+        <ActivityIndicator size="large" color="#7C5CFC" />
+        <Text className="mt-2 text-gray-600">Profil wird geladen...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F2F5FA] p-6">
@@ -172,14 +195,18 @@ const EditProfileScreen = () => {
         />
       </View>
 
+      {error && <Text className="text-red-500 mb-4 text-center">{error}</Text>}
+
       <TouchableOpacity
         onPress={handleSaveProfile}
         className="bg-indigo-600 rounded-md py-3 px-6 items-center"
         disabled={loading}
       >
-        <Text className="text-white text-lg font-bold">
-          {loading ? "Speichern..." : "Speichern"}
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text className="text-white text-lg font-bold">Speichern</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
