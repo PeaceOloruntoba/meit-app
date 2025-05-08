@@ -39,7 +39,7 @@ const ProfileScreen = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#F2F5FA] p-4 pt-20 flex-col justify-between">
+    <View className="flex-1 bg-[#F2F5FA] p-4 flex-col justify-between">
       <View>
         <TouchableOpacity
           onPress={() => router.push("/pages/profile/edit-profile")}
