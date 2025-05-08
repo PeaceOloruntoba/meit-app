@@ -29,7 +29,7 @@ const SearchDetailsScreen = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 pt-20 items-center bg-primary justify-center">
+      <View className="flex-1 items-center bg-primary justify-center">
         <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
@@ -37,7 +37,7 @@ const SearchDetailsScreen = () => {
 
   if (error) {
     return (
-      <View className="flex-1 pt-20 items-center bg-primary justify-center">
+      <View className="flex-1 items-center bg-primary justify-center">
         <Text className="text-red-500">
           Fehler beim Laden des Produkts: {error}
         </Text>
@@ -47,14 +47,14 @@ const SearchDetailsScreen = () => {
 
   if (!product) {
     return (
-      <View className="flex-1 pt-20 items-center bg-primary justify-center">
+      <View className="flex-1 items-center bg-primary justify-center">
         <Text className="text-gray-500">Produkt nicht gefunden.</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 pt-20 items-center bg-primary px-4">
+    <View className="flex-1 items-center bg-primary px-4">
       <TouchableOpacity
         onPress={navigateToDetails}
         className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
