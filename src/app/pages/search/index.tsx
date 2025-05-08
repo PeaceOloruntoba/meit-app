@@ -1,42 +1,79 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
-  Image as RNImage,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useProduct } from "@/hook/useProduct"; // Import the hook
 
 const SearchScreen = () => {
   const router = useRouter();
-  const [searchText, setSearchText] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
+  const { products, loading, error, getAllProducts } = useProduct();
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof products>([]);
+
+  useEffect(() => {
+    getAllProducts();
+  }, [getAllProducts]);
+
+  useEffect(() => {
+    if (searchText) {
+      const results = products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          product.description?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setSearchResults(results);
+    } else {
+      setSearchResults(products);
+    }
+  }, [searchText, products]);
+
+  const handleSearch = useCallback(() => {
+    // The filtering is already done in the useEffect above,
+    // so no need for a separate loading state here for the basic search.
+    console.log("Searching for:", searchText);
+  }, [searchText]);
+
+  const handleFilter = () => {
+    console.log("Navigating to filters");
+    // Implement navigation to filter screen if needed
+  };
+
+  const navigateToDetails = (productId: string) => {
+    router.push(`/pages/search/${productId}`);
+  };
+
   const carImageUrl =
     "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
 
   const blurhash =
     "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-  const handleSearch = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log("Searching for:", searchText);
-    }, 1500);
-  };
+  if (loading) {
+    return (
+      <View className="flex-1 bg-background pt-20 justify-center items-center">
+        <ActivityIndicator size="large" color={Colors.primary} />
+        <Text className="mt-2 text-textSecondary">Lade Produkte...</Text>
+      </View>
+    );
+  }
 
-  const handleFilter = () => {
-    console.log("Navigating to filters");
-  };
-
-  const navigateToDetails = () => {
-    router.push("/pages/search/123");
-  };
+  if (error) {
+    return (
+      <View className="flex-1 bg-background pt-20 justify-center items-center">
+        <Text className="text-red-500">
+          Fehler beim Laden der Produkte: {error}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-background pt-20">
@@ -59,40 +96,47 @@ const SearchScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {loading && (
-          <View className="mt-8 items-center">
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text className="mt-2 text-textSecondary">Searching...</Text>
-          </View>
-        )}
-
         <View className="mt-10 px-4">
-          <TouchableOpacity
-            onPress={navigateToDetails}
-            className="bg-white shadow-md shadow-black/70 p-4 rounded-lg mb-4 items-center flex flex-row items-center space-x-2"
-          >
-            <View className="rounded-lg overflow-hidden w-20 aspect-video">
-              <Image
-                source={{ uri: carImageUrl }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="contain"
-                placeholder={{
-                  uri: carImageUrl,
-                  blurhash: blurhash,
-                }}
-              />
-            </View>
-            <View className="flex flex-col">
-              <Text className="text-lg font-bold">Produktname</Text>
-              <Text className="text-sm text-black/70">30,00 € Kaution</Text>
-              <Text className="text-sm text-black/70">
-                30,00 € Lieferkosten
-              </Text>
-              <Text className="text-lg font-bold">
-                30,00 € <Text className="text-sm text-black/70">pro Monat</Text>
-              </Text>
-            </View>
-          </TouchableOpacity>
+          {searchResults.map((product) => (
+            <TouchableOpacity
+              key={product.id}
+              onPress={() => navigateToDetails(product.id!)}
+              className="bg-white shadow-md shadow-black/70 p-4 rounded-lg mb-4 items-center flex flex-row items-center space-x-2"
+            >
+              <View className="rounded-lg overflow-hidden w-20 aspect-video">
+                <Image
+                  source={{ uri: product.imageUrl || carImageUrl }}
+                  style={{ width: "100%", height: "100%" }}
+                  contentFit="contain"
+                  placeholder={{ uri: carImageUrl, blurhash: blurhash }}
+                />
+              </View>
+              <View className="flex flex-col">
+                <Text className="text-lg font-bold">{product.name}</Text>
+                {product.deposit !== undefined && (
+                  <Text className="text-sm text-black/70">
+                    {product.deposit} € Kaution
+                  </Text>
+                )}
+                {product.deliveryCost !== undefined && (
+                  <Text className="text-sm text-black/70">
+                    {product.deliveryCost} € Lieferkosten
+                  </Text>
+                )}
+                <Text className="text-lg font-bold">
+                  {product.price} €{" "}
+                  <Text className="text-sm text-black/70">
+                    pro {product.timePeriod === "Tag" ? "Tag" : "Monat"}
+                  </Text>
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+          {searchResults.length === 0 && !loading && (
+            <Text className="text-center text-gray-500 mt-4">
+              Keine Produkte gefunden.
+            </Text>
+          )}
         </View>
       </View>
     </View>
