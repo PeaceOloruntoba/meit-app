@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Feather, FontAwesome } from "@expo/vector-icons";
-import { useRental } from "@/hook/useRentals";
+import { useRental, Rental as RentalType } from "@/hook/useRentals";
 import { useProduct } from "@/hook/useProduct";
 import { useAuth } from "@/hook/useAuth";
 import { db } from "firebaseConfig";
@@ -14,7 +14,7 @@ interface RentalDetailsParams {
 
 const RentalDetailsScreen = () => {
   const router = useRouter();
-  const { id } = useLocalSearchParams<RentalDetailsParams>();
+  const rentalId = useLocalSearchParams(); // Get the params object
   const {
     rental,
     loading: rentalLoading,
@@ -40,10 +40,10 @@ const RentalDetailsScreen = () => {
   } | null>(null);
 
   useEffect(() => {
-    if (id) {
-      getRentalById(id);
+    if (rentalId && typeof rentalId === "object" && "id" in rentalId) {
+      getRentalById(rentalId.id as string); // Type assertion to string
     }
-  }, [getRentalById, id]);
+  }, [getRentalById, rentalId]);
 
   useEffect(() => {
     if (rental?.productId) {
@@ -89,7 +89,7 @@ const RentalDetailsScreen = () => {
     }
   };
 
-  const getStatusColor = (status: Rental["rentalStatus"]) => {
+  const getStatusColor = (status: RentalType["rentalStatus"]) => {
     switch (status) {
       case "success":
         return "bg-green-200 text-green-800";
@@ -104,7 +104,7 @@ const RentalDetailsScreen = () => {
     }
   };
 
-  const getPaymentStatusColor = (status: Rental["paymentStatus"]) => {
+  const getPaymentStatusColor = (status: RentalType["paymentStatus"]) => {
     return status === "paid"
       ? "bg-green-200 text-green-800"
       : "bg-red-200 text-red-800";
