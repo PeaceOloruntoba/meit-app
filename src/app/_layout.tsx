@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "../global.css";
-import { Slot, useRouter } from "expo-router";
+import { Slot, Stack, useRouter } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { StatusBar } from "expo-status-bar";
@@ -72,7 +72,9 @@ const AuthLayoutContent = () => {
   return (
     <>
       <StatusBar style="dark" backgroundColor={Colors.background} />
-      <Slot />
+      <Stack>
+        <Slot />
+      </Stack>
       {user && !isAuthRoute ? <BottomNav items={navigationItems} /> : null}
     </>
   );

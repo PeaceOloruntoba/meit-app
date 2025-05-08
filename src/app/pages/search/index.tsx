@@ -67,7 +67,7 @@ const SearchScreen = () => {
 
   if (error) {
     return (
-      <View className="flex-1 bg-background pt-20 justify-center items-center">
+      <View className="flex-1 bg-background justify-center items-center">
         <Text className="text-red-500">
           Fehler beim Laden der Produkte: {error}
         </Text>
@@ -76,7 +76,7 @@ const SearchScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-background pt-20">
+    <View className="flex-1 bg-background">
       <View className="px-4 pt-6">
         <View className="flex flex-row items-center space-x-2">
           <View className="flex-1 bg-white rounded-lg shadow-sm">
