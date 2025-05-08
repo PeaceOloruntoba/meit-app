@@ -8,18 +8,22 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import { useProduct } from "@/hook/useProduct"; // Import the hook
+import { toast } from "sonner-native";
 
 const AddProductScreen = () => {
   const router = useRouter();
+  const { addProduct, loading, error } = useProduct();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | undefined>();
-  const [timePeriod, setTimePeriod] = useState("");
+  const [timePeriod, setTimePeriod] = useState<"Tag" | "Monat">("Tag");
   const [deposit, setDeposit] = useState<number | undefined>();
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
   const [deliveryCost, setDeliveryCost] = useState<number | undefined>();
@@ -36,9 +40,9 @@ const AddProductScreen = () => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
+      mediaTypes: ["images"],
       allowsMultipleSelection: false,
-      quality: 1,
+      quality: 0.7,
     });
     if (!result.canceled && result.assets.length > 0) {
       setImageUrl(result.assets[0].uri);
@@ -47,6 +51,40 @@ const AddProductScreen = () => {
 
   const handleGoBack = () => {
     router.push("/pages/products");
+  };
+
+  const handleSaveProduct = async () => {
+    if (!name || !description || !price || !timePeriod) {
+      toast.error("Bitte fülle alle erforderlichen Felder aus.");
+      return;
+    }
+
+    const newProduct = {
+      name,
+      description,
+      price: Number(price),
+      timePeriod,
+      deposit: Number(deposit) || undefined,
+      deliveryAvailable,
+      deliveryCost: deliveryAvailable
+        ? Number(deliveryCost) || undefined
+        : undefined,
+      additionalDeliveryCost: deliveryAvailable
+        ? Number(additionalDeliveryCost) || undefined
+        : undefined,
+      imageUrl,
+      startDate,
+      endDate,
+      contactEmail,
+      contactWebsite,
+      contactWhatsApp,
+      location,
+    };
+
+    await addProduct(newProduct);
+    if (!loading && !error) {
+      router.push("/pages/products");
+    }
   };
 
   return (
@@ -67,6 +105,7 @@ const AddProductScreen = () => {
         <Text className="text-2xl font-bold mb-4 text-textPrimary">
           Produkt hinzufügen
         </Text>
+        {error && <Text className="text-red-500 mb-2">{error}</Text>}
         <View className="mb-4">
           <Text className="text-lg font-medium mb-2 text-textPrimary">
             Name
@@ -108,7 +147,9 @@ const AddProductScreen = () => {
           </Text>
           <Picker
             selectedValue={timePeriod}
-            onValueChange={(itemValue) => setTimePeriod(itemValue)}
+            onValueChange={(itemValue) =>
+              setTimePeriod(itemValue as "Tag" | "Monat")
+            }
             className="border border-secondary rounded-md bg-white"
           >
             <Picker.Item label="Tag" value="Tag" />
@@ -266,13 +307,17 @@ const AddProductScreen = () => {
           )}
         </View>
         <TouchableOpacity
-          onPress={() => {
-            console.log("Add product pressed");
-            router.push("/pages/products");
-          }}
-          className="bg-[#7D7AFF] rounded-md p-4 mt-6 items-center"
+          onPress={handleSaveProduct}
+          className={`bg-[#7D7AFF] rounded-md p-4 mt-6 items-center ${
+            loading ? "opacity-50" : ""
+          }`}
+          disabled={loading}
         >
-          <Text className="text-white text-lg font-bold">Speichern</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-lg font-bold">Speichern</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
