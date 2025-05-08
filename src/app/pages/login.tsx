@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import Colors from "../../constants/Colors";
 import { Link, useRouter } from "expo-router";
 import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
 import { useAuth } from "@/hook/useAuth";
