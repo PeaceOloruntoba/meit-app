@@ -71,8 +71,8 @@ const EditProfileScreen = () => {
       };
 
       await updateProfile(user.uid, updatedData); // Call updateProfile from hook
-      // toast.success("Profil erfolgreich aktualisiert!");
-      router.back();
+      toast.success("Profil erfolgreich aktualisiert!");
+      router.push("/pages/profile");
     } catch (err: any) {
       setError(err.message || "Fehler beim Speichern des Profils.");
       toast.error(`Profilaktualisierung fehlgeschlagen: ${err.message}`);
