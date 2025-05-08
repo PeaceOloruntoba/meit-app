@@ -34,7 +34,7 @@ const ProfileScreen = () => {
   //   }
 
   const handleLogout = () => {
-    router.push("/auth/login");
+    router.push("/pages/login");
   };
 
   return (

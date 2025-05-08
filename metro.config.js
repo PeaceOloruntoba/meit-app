@@ -6,6 +6,13 @@ const {
 
 const config = getDefaultConfig(__dirname);
 
+// defaultConfig.resolver.unstable_enablePackageExports = false;
+
+config.resolver.unstable_enablePackageExports = false;
+
+config.resolver.unstable_enableSymlinks = false;
+
+
 module.exports = wrapWithReanimatedMetroConfig(
   withNativeWind(config, {
     input: "./src/global.css",

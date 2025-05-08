@@ -213,7 +213,7 @@ const RegisterScreen = () => {
         {/* <Text className="text-white font-semibold text-base">
           {loading ? "Registrieren..." : "Jetzt registrieren"}
         </Text> */}
-        Jetzt registrieren
+        <Text>Jetzt registrieren</Text>
       </TouchableOpacity>
 
       <Text className="text-gray-500 mt-4">
