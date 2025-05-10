@@ -24,9 +24,14 @@ export interface Rental {
   paymentStatus: "paid" | "unpaid";
   rentalStatus: "pending" | "cancelled" | "success" | "ongoing";
   createdAt: FieldValue;
+  product?: any; // Adjust type as needed
+  owner?: { uid: string; email?: string } | null;
+  renter?: { uid: string; email?: string } | null;
 }
 
 const rentalsCollection = collection(db, "rentals");
+const usersCollection = collection(db, "users");
+const productsCollection = collection(db, "products");
 
 export const useRental = () => {
   const { user } = useAuth();
@@ -59,7 +64,7 @@ export const useRental = () => {
         setLoading(false);
         return docRef.id;
       } catch (e: any) {
-        console.log(e)
+        console.log(e);
         setError(e.message || "Failed to create rental");
         toast.error(`Fehler beim Senden der Mietanfrage: ${e.message}`);
         setLoading(false);
@@ -121,9 +126,9 @@ export const useRental = () => {
       const q = query(rentalsCollection, where("userId", "==", userId));
       const querySnapshot = await getDocs(q);
       const userRentals: Rental[] = [];
-      querySnapshot.forEach((doc) => {
+      for (const doc of querySnapshot.docs) {
         userRentals.push({ id: doc.id, ...doc.data() } as Rental);
-      });
+      }
       setRentals(userRentals);
       setLoading(false);
       return userRentals;
@@ -142,9 +147,9 @@ export const useRental = () => {
       const q = query(rentalsCollection, where("ownerId", "==", ownerId));
       const querySnapshot = await getDocs(q);
       const ownerRentals: Rental[] = [];
-      querySnapshot.forEach((doc) => {
+      for (const doc of querySnapshot.docs) {
         ownerRentals.push({ id: doc.id, ...doc.data() } as Rental);
-      });
+      }
       setRentals(ownerRentals);
       setLoading(false);
       return ownerRentals;
@@ -158,16 +163,45 @@ export const useRental = () => {
     }
   }, []);
 
-  const getRentalById = useCallback(async (rentalId: string) => {
+  const getRentalDetails = useCallback(async (rentalId: string) => {
     setLoading(true);
     setError(null);
+    setRental(null); // Reset previous rental data
+
     try {
-      const rentalDoc = doc(db, "rentals", rentalId);
-      const docSnap = await getDoc(rentalDoc);
-      if (docSnap.exists()) {
-        setRental({ id: docSnap.id, ...docSnap.data() } as Rental);
+      const rentalDocRef = doc(db, "rentals", rentalId);
+      const rentalDocSnap = await getDoc(rentalDocRef);
+
+      if (rentalDocSnap.exists()) {
+        const rentalData = {
+          id: rentalDocSnap.id,
+          ...rentalDocSnap.data(),
+        } as Rental;
+
+        // Fetch associated product
+        const productDocRef = doc(productsCollection, rentalData.productId);
+        const productDocSnap = await getDoc(productDocRef);
+        rentalData.product = productDocSnap.exists()
+          ? productDocSnap.data()
+          : null;
+
+        // Fetch owner
+        const ownerDocRef = doc(usersCollection, rentalData.ownerId);
+        const ownerDocSnap = await getDoc(ownerDocRef);
+        rentalData.owner = ownerDocSnap.exists()
+          ? { uid: ownerDocSnap.id, email: ownerDocSnap.data()?.email }
+          : null;
+
+        // Fetch renter
+        const renterDocRef = doc(usersCollection, rentalData.userId);
+        const renterDocSnap = await getDoc(renterDocRef);
+        rentalData.renter = renterDocSnap.exists()
+          ? { uid: renterDocSnap.id, email: renterDocSnap.data()?.email }
+          : null;
+
+        setRental(rentalData);
         setLoading(false);
-        return { id: docSnap.id, ...docSnap.data() } as Rental;
+        return rentalData;
       } else {
         setError("Rental not found");
         toast.error("Mietvorgang nicht gefunden");
@@ -175,8 +209,8 @@ export const useRental = () => {
         return null;
       }
     } catch (e: any) {
-      setError(e.message || "Failed to fetch rental");
-      toast.error(`Fehler beim Laden des Mietvorgangs: ${e.message}`);
+      setError(e.message || "Failed to fetch rental details");
+      toast.error(`Fehler beim Laden der Mietdetails: ${e.message}`);
       setLoading(false);
       return null;
     }
@@ -192,6 +226,6 @@ export const useRental = () => {
     updateRentalStatus,
     getRentalsByUserId,
     getRentalsByOwnerId,
-    getRentalById,
+    getRentalById: getRentalDetails, // Rename the original getRentalById
   };
 };
