@@ -21,11 +21,18 @@
         "origin": "https://n"
       },
       "eas": {
-        "projectId": "4b9a4612-8457-4a76-b812-c8b14c82a6a0"
+        "projectId": "45bb3aca-7a05-4c57-8ebf-e989320c8c51"
       }
     },
     "android": {
       "package": "com.peaceoloruntoba.meitapp"
-    }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/45bb3aca-7a05-4c57-8ebf-e989320c8c51"
+    },
+    "ios": {}
   }
 }
