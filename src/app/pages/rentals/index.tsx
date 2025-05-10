@@ -27,9 +27,6 @@ const RentalScreen = () => {
     fetchData();
   }, [tab, user?.uid]);
 
-  useEffect(() => {
-    console.log("Current filter:", tab);
-  }, [tab]);
 
   const navigateToDetails = (rentalId: string) => {
     router.push(`/pages/rentals/${rentalId}`);
