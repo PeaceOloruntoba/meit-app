@@ -14,7 +14,7 @@ interface RentalDetailsParams {
 
 const RentalDetailsScreen = () => {
   const router = useRouter();
-  const rentalId = useLocalSearchParams<RentalDetailsParams>();
+  const rentalId = useLocalSearchParams();
   const {
     rental,
     loading: rentalLoading,
@@ -39,14 +39,19 @@ const RentalDetailsScreen = () => {
     email?: string;
   } | null>(null);
 
-  if (rentalId) {
-    getRentalById(rentalId.id); // Type assertion to string
-  }
+  useEffect(() => {
+    if (rentalId) {
+      getRentalById(rentalId?.id as string);
+    }
+  }, [getRentalById, rentalId]);
 
   useEffect(() => {
     if (rental?.productId) {
       getSingleProduct(rental.productId);
     }
+  }, [getSingleProduct, rental?.productId]);
+
+  useEffect(() => {
     if (rental?.ownerId) {
       const ownerRef = doc(db, "users", rental.ownerId);
       getDoc(ownerRef).then((docSnap) => {
@@ -57,6 +62,9 @@ const RentalDetailsScreen = () => {
         }
       });
     }
+  }, [rental?.ownerId]);
+
+  useEffect(() => {
     if (rental?.userId) {
       const renterRef = doc(db, "users", rental.userId);
       getDoc(renterRef).then((docSnap) => {
@@ -67,7 +75,7 @@ const RentalDetailsScreen = () => {
         }
       });
     }
-  }, [rental, getSingleProduct]);
+  }, [rental?.userId]);
 
   const navigateBack = () => {
     router.back();
