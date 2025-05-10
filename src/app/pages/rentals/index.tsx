@@ -14,14 +14,22 @@ const RentalScreen = () => {
   const [filter, setFilter] = useState<"gemietet" | "vermietet">("gemietet");
 
   useEffect(() => {
-    if (user?.uid) {
+    const fetchData = async () => {
+      if (!user?.uid) return;
+
       if (filter === "gemietet") {
-        getRentalsByUserId(user.uid);
+        await getRentalsByUserId(user.uid);
       } else {
-        getRentalsByOwnerId(user.uid);
+        await getRentalsByOwnerId(user.uid);
       }
-    }
-  }, [filter, getRentalsByUserId, getRentalsByOwnerId, user?.uid]);
+    };
+
+    fetchData();
+  }, [filter, user?.uid]);
+
+  useEffect(() => {
+    console.log("Current filter:", filter);
+  }, [filter]);
 
   const handleSwitchTab = (newFilter: "gemietet" | "vermietet") => {
     setFilter(newFilter);
