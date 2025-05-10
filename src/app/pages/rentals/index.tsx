@@ -11,13 +11,13 @@ const RentalScreen = () => {
   const { user } = useAuth();
   const { loading, error, rentals, getRentalsByUserId, getRentalsByOwnerId } =
     useRental();
-  const [filter, setFilter] = useState<"gemietet" | "vermietet">("gemietet");
+  const [tab, setTab] = useState<"gemietet" | "vermietet">("gemietet");
 
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.uid) return;
 
-      if (filter === "gemietet") {
+      if (tab === "gemietet") {
         await getRentalsByUserId(user.uid);
       } else {
         await getRentalsByOwnerId(user.uid);
@@ -25,15 +25,11 @@ const RentalScreen = () => {
     };
 
     fetchData();
-  }, [filter, user?.uid]);
+  }, [tab, user?.uid]);
 
   useEffect(() => {
-    console.log("Current filter:", filter);
-  }, [filter]);
-
-  const handleSwitchTab = (newFilter: "gemietet" | "vermietet") => {
-    setFilter(newFilter);
-  };
+    console.log("Current filter:", tab);
+  }, [tab]);
 
   const navigateToDetails = (rentalId: string) => {
     router.push(`/pages/rentals/${rentalId}`);
@@ -93,26 +89,30 @@ const RentalScreen = () => {
         <Text className="text-2xl font-semibold mb-4">Übersicht</Text>
         <View className="flex flex-row items-center justify-center space-x-2 text-lg bg-gray-100 text-gray-700 rounded-lg border border-gray-200">
           <TouchableOpacity
-            onPress={() => handleSwitchTab("gemietet")}
-            className={`rounded-lg p-3 ${
-              filter === "gemietet"
-                ? "bg-white shadow-md text-indigo-600 font-semibold"
-                : ""
+            onPress={() => setTab("gemietet")}
+            className={`flex-1 items-center py-3 rounded-lg mr-2 ${
+              tab === "gemietet" ? "bg-blue-600" : "bg-gray-200"
             }`}
           >
-            <Text className={filter === "gemietet" ? "text-indigo-600" : ""}>
+            <Text
+              className={`${
+                tab === "gemietet" ? "text-white font-bold" : "text-gray-700"
+              }`}
+            >
               Gemietet
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => handleSwitchTab("vermietet")}
-            className={`rounded-lg p-3 ${
-              filter === "vermietet"
-                ? "bg-white shadow-md text-indigo-600 font-semibold"
-                : ""
+            onPress={() => setTab("vermietet")}
+            className={`flex-1 items-center py-3 rounded-lg ${
+              tab === "vermietet" ? "bg-blue-600" : "bg-gray-200"
             }`}
           >
-            <Text className={filter === "vermietet" ? "text-indigo-600" : ""}>
+            <Text
+              className={`${
+                tab === "vermietet" ? "text-white font-bold" : "text-gray-700"
+              }`}
+            >
               Vermietet
             </Text>
           </TouchableOpacity>
