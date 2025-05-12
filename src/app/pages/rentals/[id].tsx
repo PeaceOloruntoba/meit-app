@@ -88,10 +88,10 @@ const RentalDetailsScreen = () => {
   const isRenter = currentUser?.uid === rental.userId;
 
   return (
-    <View className="flex-1 bg-background p-4">
+    <View className="flex-1 bg-background p-4 pt-20">
       <TouchableOpacity
         onPress={navigateBack}
-        className="absolute top-10 right-4 bg-black rounded-md p-2 z-10"
+        className="absolute top-20 right-4 bg-black rounded-md p-2 z-10"
       >
         <Feather name="x" size={24} color="white" />
       </TouchableOpacity>
