@@ -98,7 +98,7 @@ const AddProductScreen = () => {
       >
         <TouchableOpacity
           onPress={() => router.back()}
-          className="absolute top-2 right-4 bg-black rounded-md p-2 z-10"
+          className="absolute top-2 right-4 bg-black rounded-md p-2 pt-20 z-10"
         >
           <Feather name="x" size={24} color="white" />
         </TouchableOpacity>

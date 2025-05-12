@@ -76,7 +76,7 @@ const SearchScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-20">
       <View className="px-4 pt-6">
         <View className="flex flex-row items-center space-x-2">
           <View className="flex-1 bg-white rounded-lg shadow-sm">

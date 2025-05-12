@@ -66,8 +66,6 @@ const EditProfileScreen = () => {
         address,
         taxId,
         whatsappNumber,
-        //  frontIdImageUrl: frontIdImage,  //  upload and get url
-        //  backIdImageUrl: backIdImage,    // upload and get url
       };
 
       await updateProfile(user.uid, updatedData);
@@ -91,7 +89,7 @@ const EditProfileScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F2F5FA] p-6">
+    <View className="flex-1 bg-[#F2F5FA] p-6 pt-20">
       <TouchableOpacity onPress={() => router.back()} className="mb-4">
         <Feather name="arrow-left" size={24} color="#374151" />
       </TouchableOpacity>

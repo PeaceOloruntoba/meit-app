@@ -93,10 +93,10 @@ const SearchDetailsScreen = () => {
   }
 
   return (
-    <View className="flex-1 items-center bg-primary p-4">
+    <View className="flex-1 items-center bg-primary p-4 pt-20">
       <TouchableOpacity
         onPress={navigateToSearch}
-        className="bg-black rounded-lg p-3 shadow-md absolute top-2 right-4"
+        className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
       >
         <Feather name="x" size={24} color="white" />
       </TouchableOpacity>

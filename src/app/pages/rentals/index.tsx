@@ -81,7 +81,7 @@ const RentalScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-20">
       <View className="px-4 pt-6 w-full flex flex-col items-center justify-center">
         <Text className="text-2xl font-semibold mb-4">Übersicht</Text>
         <View className="flex flex-row items-center justify-center space-x-2 text-lg bg-gray-100 text-gray-700 rounded-lg border border-gray-200">

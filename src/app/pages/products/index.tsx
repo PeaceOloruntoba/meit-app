@@ -47,7 +47,7 @@ const ProductsScreen = () => {
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-20">
       <View className="px-4 pt-6">
         <View className="flex items-center absolute right-4 top-1">
           <TouchableOpacity
