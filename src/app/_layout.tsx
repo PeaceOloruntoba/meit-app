@@ -69,7 +69,7 @@ const AuthLayoutContent = () => {
   //   return (
   //     <View className="flex-1 justify-center items-center bg-primary">
   //       <Text className="text-white text-3xl font-bold mb-4">
-  //         Welcome to Meit App
+  //         Welcome to Miet App
   //       </Text>
   //       <ActivityIndicator size="large" color="#ffffff" />
   //     </View>

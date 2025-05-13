@@ -14,8 +14,8 @@
         }
       ]
     ],
-    "name": "meit-app",
-    "slug": "meit-app",
+    "name": "miet-app",
+    "slug": "miet-app",
     "extra": {
       "router": {
         "origin": "https://n"
@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "package": "com.peaceoloruntoba.meitapp"
+      "package": "com.peaceoloruntoba.mietapp"
     },
     "runtimeVersion": {
       "policy": "appVersion"
