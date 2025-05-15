@@ -158,22 +158,22 @@ const RentalDetailsScreen = () => {
           {rental.rentalStatus.toUpperCase()}
         </Text>
         {isOwner && (
-          <View className="mt-2 flex flex-row space-x-2">
+          <View className="mt-2 flex items-center justify-center gap-4 flex-row space-x-2">
             {rental.rentalStatus !== "success" && (
               <TouchableOpacity
                 onPress={() => handleUpdateRentalStatus("success")}
-                className="bg-green-600 text-white py-2 px-4 rounded-md"
+                className="bg-green-600 py-2 px-4 rounded-md"
               >
-                <Text>Abschließen</Text>
+                <Text className="text-white">Abschließen</Text>
               </TouchableOpacity>
             )}
             {rental.rentalStatus !== "ongoing" &&
               rental.paymentStatus === "paid" && (
                 <TouchableOpacity
                   onPress={() => handleUpdateRentalStatus("ongoing")}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-md"
+                  className="bg-blue-600 py-2 px-4 rounded-md"
                 >
-                  <Text>Als Laufend Markieren</Text>
+                  <Text className="text-white">Als Laufend Markieren</Text>
                 </TouchableOpacity>
               )}
           </View>
@@ -183,9 +183,9 @@ const RentalDetailsScreen = () => {
           rental.paymentStatus === "unpaid" && (
             <TouchableOpacity
               onPress={() => handleUpdateRentalStatus("cancelled")}
-              className="mt-2 bg-red-600 text-white py-2 px-4 rounded-md"
+              className="mt-2 bg-red-600 py-2 px-4 rounded-md"
             >
-              <Text>Stornieren</Text>
+              <Text className="text-white">Stornieren</Text>
             </TouchableOpacity>
           )}
         {isRenter &&
