@@ -1,20 +1,43 @@
-import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { Image } from "expo-image";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useProduct } from "@/hook/useProduct"; // Import the hook
+import { useAuth } from "@/hook/useAuth";
 
 const ProductsDetailsScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { product, loading, error, getSingleProduct } = useProduct();
+  const {
+    product,
+    loading,
+    error,
+    getSingleProduct,
+    deleteProduct: deleteProductHook,
+  } = useProduct();
+  const { user } = useAuth();
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     if (id) {
       getSingleProduct(id);
     }
   }, [getSingleProduct, id]);
+
+  useEffect(() => {
+    if (product && user) {
+      setIsOwner(product.userId === user.uid);
+    } else {
+      setIsOwner(false);
+    }
+  }, [product, user]);
 
   const carImageUrl =
     "https://res.cloudinary.com/ducorig4o/image/upload/v1723891447/samples/ecommerce/car-interior-design.jpg";
@@ -25,6 +48,31 @@ const ProductsDetailsScreen = () => {
 
   const blurhash =
     "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
+
+  const handleDeleteProduct = () => {
+    if (product?.id && product?.name) {
+      Alert.alert(
+        "Produkt löschen",
+        `Möchten Sie das Produkt "${product.name}" wirklich löschen?`,
+        [
+          {
+            text: "Abbrechen",
+            style: "cancel",
+          },
+          {
+            text: "Löschen",
+            style: "destructive",
+            onPress: async () => {
+              const success = await deleteProductHook(product.id, product.name);
+              if (success) {
+                router.push("/pages/products");
+              }
+            },
+          },
+        ]
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -177,13 +225,17 @@ const ProductsDetailsScreen = () => {
             </Text>
           </View>
         )}
-        <TouchableOpacity
-          onPress={navigateToDetails}
-          className="bg-red-600 flex flex-row items-center justify-center gap-4 rounded-lg p-3 shadow-md w-full"
-        >
-          <Feather name="trash" size={24} color="white" />
-          <Text className="text-white text-[24px] font-semibold">Delete</Text>
-        </TouchableOpacity>
+        {isOwner && (
+          <TouchableOpacity
+            onPress={handleDeleteProduct}
+            className="bg-red-600 flex flex-row items-center justify-center gap-4 rounded-lg p-3 shadow-md w-full"
+          >
+            <Feather name="trash" size={24} color="white" />
+            <Text className="text-white text-[24px] font-semibold">
+              Löschen
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
