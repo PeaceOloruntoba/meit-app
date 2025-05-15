@@ -48,7 +48,7 @@ export const useProduct = () => {
       setLoading(true);
       setError(null);
       if (!user?.uid) {
-        setError("User not authenticated");
+        setError("Benutzer nicht authentifiziert");
         setLoading(false);
         toast.error("Nicht authentifiziert");
         return;
@@ -62,8 +62,8 @@ export const useProduct = () => {
         setLoading(false);
         return docRef.id;
       } catch (e: any) {
-        setError(e.message || "Failed to add product");
-        console.log(e)
+        setError(e.message || "Fehler beim Hinzufügen des Produkts");
+        console.log(e);
         toast.error(`Fehler beim Hinzufügen des Produkts: ${e.message}`);
         setLoading(false);
         return null;
@@ -83,7 +83,7 @@ export const useProduct = () => {
         setLoading(false);
         return true;
       } catch (e: any) {
-        setError(e.message || "Failed to edit product");
+        setError(e.message || "Fehler beim Bearbeiten des Produkts");
         toast.error(`Fehler beim Aktualisieren des Produkts: ${e.message}`);
         setLoading(false);
         return false;
@@ -105,7 +105,7 @@ export const useProduct = () => {
       setLoading(false);
       return productsList;
     } catch (e: any) {
-      setError(e.message || "Failed to fetch products");
+      setError(e.message || "Fehler beim Abrufen der Produkte");
       toast.error(`Fehler beim Laden der Produkte: ${e.message}`);
       setLoading(false);
       return [];
@@ -123,13 +123,13 @@ export const useProduct = () => {
         setLoading(false);
         return { id: docSnap.id, ...docSnap.data() } as Product;
       } else {
-        setError("Product not found");
+        setError("Produkt nicht gefunden");
         toast.error("Produkt nicht gefunden");
         setLoading(false);
         return null;
       }
     } catch (e: any) {
-      setError(e.message || "Failed to fetch product");
+      setError(e.message || "Fehler beim Abrufen des Produkts");
       toast.error(`Fehler beim Laden des Produkts: ${e.message}`);
       setLoading(false);
       return null;
@@ -150,12 +150,32 @@ export const useProduct = () => {
       setLoading(false);
       return userProducts;
     } catch (e: any) {
-      setError(e.message || "Failed to fetch user's products");
+      setError(e.message || "Fehler beim Abrufen der Produkte des Benutzers");
       toast.error(`Fehler beim Laden deiner Produkte: ${e.message}`);
       setLoading(false);
       return [];
     }
   }, []);
+
+  const deleteProduct = useCallback(
+    async (productId: string, productName: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const productDoc = doc(db, "products", productId);
+        await deleteDoc(productDoc);
+        toast.success(`Produkt "${productName}" gelöscht!`);
+        setLoading(false);
+        return true;
+      } catch (e: any) {
+        setError(e.message || "Fehler beim Löschen des Produkts");
+        toast.error(`Fehler beim Löschen des Produkts: ${e.message}`);
+        setLoading(false);
+        return false;
+      }
+    },
+    []
+  );
 
   return {
     loading,
@@ -167,5 +187,6 @@ export const useProduct = () => {
     getAllProducts,
     getSingleProduct,
     getUsersProducts,
+    deleteProduct,
   };
 };
