@@ -61,6 +61,10 @@ const RentalDetailsScreen = () => {
     }
   };
 
+  const getPaymentStatusText = (status: Rental["paymentStatus"]) => {
+    return status === "paid" ? "Bezahlt" : "Unbezahlt";
+  };
+
   const getPaymentStatusColor = (status: Rental["paymentStatus"]) => {
     return status === "paid"
       ? "bg-green-200 text-green-800"
@@ -131,7 +135,7 @@ const RentalDetailsScreen = () => {
             rental.paymentStatus
           )}`}
         >
-          {rental.paymentStatus.toUpperCase()}
+          {getPaymentStatusText(rental.paymentStatus).toUpperCase()}
         </Text>
         {isRenter && rental.paymentStatus === "unpaid" && (
           <TouchableOpacity
