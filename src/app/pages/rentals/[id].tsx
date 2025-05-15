@@ -142,7 +142,7 @@ const RentalDetailsScreen = () => {
             onPress={() => handleUpdatePaymentStatus("paid")}
             className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded-md"
           >
-            <Text>Als Bezahlt Markieren</Text>
+            <Text className="text-white">Als Bezahlt Markieren</Text>
           </TouchableOpacity>
         )}
       </View>
