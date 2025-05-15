@@ -131,7 +131,7 @@ const RentalDetailsScreen = () => {
           Zahlungsstatus
         </Text>
         <Text
-          className={`inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium ${getPaymentStatusColor(
+          className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getPaymentStatusColor(
             rental.paymentStatus
           )}`}
         >
@@ -151,7 +151,7 @@ const RentalDetailsScreen = () => {
           Mietstatus
         </Text>
         <Text
-          className={`inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium ${getStatusColor(
+          className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(
             rental.rentalStatus
           )}`}
         >
@@ -195,7 +195,7 @@ const RentalDetailsScreen = () => {
               onPress={() => handleUpdateRentalStatus("cancelled")}
               className="mt-2 bg-red-600 text-white py-2 px-4 rounded-md"
             >
-              <Text>Stornieren</Text>
+              <Text className="text-white">Stornieren</Text>
             </TouchableOpacity>
           )}
       </View>
