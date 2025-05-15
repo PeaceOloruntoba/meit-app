@@ -53,10 +53,10 @@ const ProductsDetailsScreen = () => {
   }
 
   return (
-    <View className="flex-1 items-center bg-primary px-4">
+    <View className="flex-1 items-center bg-primary px-4 pt-20">
       <TouchableOpacity
         onPress={navigateToDetails}
-        className="bg-black rounded-lg p-3 shadow-md absolute top-2 right-4"
+        className="bg-black rounded-lg p-3 shadow-md absolute top-20 right-4"
       >
         <Feather name="x" size={24} color="white" />
       </TouchableOpacity>
@@ -177,6 +177,13 @@ const ProductsDetailsScreen = () => {
             </Text>
           </View>
         )}
+        <TouchableOpacity
+          onPress={navigateToDetails}
+          className="bg-red-600 flex flex-row items-center justify-center gap-4 rounded-lg p-3 shadow-md w-full"
+        >
+          <Feather name="trash" size={24} color="white" />
+          <Text className="text-white text-[24px] font-semibold">Delete</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
