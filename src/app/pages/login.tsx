@@ -66,14 +66,14 @@ const LoginScreen = () => {
         <View className="flex-1 h-px bg-gray-300" />
       </View>
 
-      <View className="flex-row justify-between w-full px-6 mb-10">
-        <TouchableOpacity className="bg-white p-4 rounded-xl shadow-md">
+      <View className="flex-row justify-around w-full px-6 mb-10">
+        <TouchableOpacity className="bg-white p-4 rounded-xl shadow-md w-16 flex items-center">
           <FontAwesome name="facebook" size={24} color="#3b5998" />
         </TouchableOpacity>
-        <TouchableOpacity className="bg-white p-4 rounded-xl shadow-md">
+        <TouchableOpacity className="bg-white p-4 rounded-xl shadow-md w-16 flex items-center">
           <AntDesign name="google" size={24} color="#DB4437" />
         </TouchableOpacity>
-        <TouchableOpacity className="bg-white p-4 rounded-xl shadow-md">
+        <TouchableOpacity className="bg-white p-4 rounded-xl shadow-md w-16 flex items-center">
           <Entypo name="app-store" size={24} color="#000" />
         </TouchableOpacity>
       </View>
