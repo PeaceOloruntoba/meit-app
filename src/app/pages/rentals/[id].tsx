@@ -61,6 +61,21 @@ const RentalDetailsScreen = () => {
     }
   };
 
+  const getStatusText = (status: Rental["rentalStatus"]) => {
+    switch (status) {
+      case "success":
+        return "Erfolgreich";
+      case "ongoing":
+        return "Laufend";
+      case "pending":
+        return "Ausstehend";
+      case "cancelled":
+        return "Storniert";
+      default:
+        return "";
+    }
+  };
+
   const getPaymentStatusText = (status: Rental["paymentStatus"]) => {
     return status === "paid" ? "Bezahlt" : "Unbezahlt";
   };
@@ -155,7 +170,7 @@ const RentalDetailsScreen = () => {
             rental.rentalStatus
           )}`}
         >
-          {rental.rentalStatus.toUpperCase()}
+          {getStatusText(rental.rentalStatus).toUpperCase()}
         </Text>
         {isOwner && (
           <View className="mt-2 flex items-center justify-center gap-4 flex-row space-x-2">
