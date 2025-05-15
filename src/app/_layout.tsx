@@ -36,12 +36,12 @@ const AuthLayoutContent = () => {
   const isAuthRoute = pathname === "/pages/login";
 
   useEffect(() => {
+    setShowSplash(false);
     const timer = setTimeout(() => {
-      setShowSplash(false);
       if (!loading && !user) {
         router.replace("/pages/login");
       }
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [loading, user]);
