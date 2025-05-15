@@ -6,9 +6,13 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile as firebaseUpdateProfile, // Alias to avoid naming conflict
+  deleteUser as firebaseDeleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import { toast } from "sonner-native";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { Alert } from "react-native";
 
 const AuthContext = createContext(null);
 
@@ -71,10 +75,10 @@ export const AuthProvider = ({ children }) => {
         setUser(userCredential.user);
       }
 
-      toast.success("Registration successful!");
+      toast.success("Registrierung erfolgreich!");
     } catch (error) {
-      console.error("Registration error:", error.message);
-      toast.error(`Registration failed: ${error.message}`);
+      console.error("Registrierungsfehler:", error.message);
+      toast.error(`Registrierung fehlgeschlagen: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -96,10 +100,10 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(userCredential.user);
       }
-      toast.success("Login successful!");
+      toast.success("Anmeldung erfolgreich!");
     } catch (error) {
-      console.error("Login error:", error.message);
-      toast.error(`Login failed: ${error.message}`);
+      console.error("Anmeldefehler:", error.message);
+      toast.error(`Anmeldung fehlgeschlagen: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -110,10 +114,10 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setUser(null);
-      toast.success("Logout successful!");
+      toast.success("Abmeldung erfolgreich!");
     } catch (error) {
-      console.error("Logout error:", error.message);
-      toast.error(`Logout failed: ${error.message}`);
+      console.error("Abmeldefehler:", error.message);
+      toast.error(`Abmeldung fehlgeschlagen: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -143,8 +147,45 @@ export const AuthProvider = ({ children }) => {
         // toast.success("Profile updated successfully!");
       }
     } catch (error) {
-      console.error("Update profile error:", error.message);
-      toast.error(`Failed to update profile: ${error.message}`);
+      console.error("Profilaktualisierungsfehler:", error.message);
+      toast.error(`Profilaktualisierung fehlgeschlagen: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteAccount = async (email, password) => {
+    setLoading(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        toast.error("Kein Benutzer angemeldet.");
+        setLoading(false);
+        return false;
+      }
+
+      const credential = EmailAuthProvider.credential(
+        currentUser.email,
+        password
+      );
+      await reauthenticateWithCredential(currentUser, credential);
+
+      await firebaseDeleteUser(currentUser);
+      setUser(null);
+      toast.success("Konto erfolgreich gelöscht.");
+      return true;
+    } catch (error) {
+      console.error("Kontolöschfehler:", error.message);
+      let errorMessage = "Fehler beim Löschen des Kontos.";
+      if (error.code === "auth/wrong-password") {
+        errorMessage = "Falsches Passwort.";
+      } else if (error.code === "auth/requires-recent-login") {
+        errorMessage =
+          "Erfordert erneute Anmeldung. Bitte melden Sie sich erneut an und versuchen Sie es noch einmal.";
+        signOut(auth);
+      }
+      toast.error(errorMessage);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -152,7 +193,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, register, login, logout, updateProfile }}
+      value={{
+        user,
+        loading,
+        register,
+        login,
+        logout,
+        updateProfile,
+        deleteAccount,
+      }}
     >
       {children}
     </AuthContext.Provider>
