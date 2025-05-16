@@ -141,17 +141,19 @@ const RentalDetailsScreen = () => {
         <Text className="text-lg font-semibold text-textPrimary">Preis</Text>
         <Text className="text-textSecondary">{rental.price} €</Text>
       </View>
-      <View className="mb-4">
-        <Text className="text-lg font-semibold text-textPrimary">
-          Zahlungsstatus
-        </Text>
-        <Text
-          className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getPaymentStatusColor(
-            rental.paymentStatus
-          )}`}
-        >
-          {getPaymentStatusText(rental.paymentStatus).toUpperCase()}
-        </Text>
+      <View className="mb-4 flex flex-row items-center justify-center gap-4">
+        <View>
+          <Text className="text-lg font-semibold text-textPrimary">
+            Zahlungsstatus
+          </Text>
+          <Text
+            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getPaymentStatusColor(
+              rental.paymentStatus
+            )}`}
+          >
+            {getPaymentStatusText(rental.paymentStatus).toUpperCase()}
+          </Text>
+        </View>
         {isRenter && rental.paymentStatus === "unpaid" && (
           <TouchableOpacity
             onPress={() => handleUpdatePaymentStatus("paid")}
@@ -161,17 +163,19 @@ const RentalDetailsScreen = () => {
           </TouchableOpacity>
         )}
       </View>
-      <View className="mb-4">
-        <Text className="text-lg font-semibold text-textPrimary">
-          Mietstatus
-        </Text>
-        <Text
-          className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(
-            rental.rentalStatus
-          )}`}
-        >
-          {getStatusText(rental.rentalStatus).toUpperCase()}
-        </Text>
+      <View className="mb-4 flex flex-row items-center justify-center gap-4">
+        <View>
+          <Text className="text-lg font-semibold text-textPrimary">
+            Mietstatus
+          </Text>
+          <Text
+            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(
+              rental.rentalStatus
+            )}`}
+          >
+            {getStatusText(rental.rentalStatus).toUpperCase()}
+          </Text>
+        </View>
         {isOwner && (
           <View className="mt-2 flex items-center justify-center gap-4 flex-row space-x-2">
             {rental.rentalStatus !== "success" && (
