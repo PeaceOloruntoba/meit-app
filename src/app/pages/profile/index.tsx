@@ -139,7 +139,7 @@ const ProfileScreen = () => {
                 className="bg-red-600 text-white px-4 py-2 rounded-md"
                 disabled={loading}
               >
-                <Text>{loading ? "Löschen..." : "Konto löschen"}</Text>
+                <Text className="text-white">{loading ? "Löschen..." : "Konto löschen"}</Text>
               </TouchableOpacity>
             </View>
           </View>
