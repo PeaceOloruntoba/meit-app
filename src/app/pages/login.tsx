@@ -18,11 +18,11 @@ const LoginScreen = () => {
 
   return (
     <View className="flex-1 items-center justify-center bg-[#F5F7FA] px-6">
-      <Text className="text-3xl font-bold text-black mb-2">Hello Again!</Text>
-      <Text className="text-center text-gray-500 mb-8">
+      <Text className="text-3xl font-bold text-black mb-2">Willkommen!</Text>
+      {/* <Text className="text-center text-gray-500 mb-8">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet, urna, a,
         fusce
-      </Text>
+      </Text> */}
 
       <TextInput
         placeholder="Deine E-Mail"
@@ -62,7 +62,7 @@ const LoginScreen = () => {
       </TouchableOpacity>
       <View className="flex-row items-center mb-6 w-full">
         <View className="flex-1 h-px bg-gray-300" />
-        <Text className="mx-4 text-gray-400">Oder Login mit</Text>
+        <Text className="mx-4 text-gray-400">oder Login mit</Text>
         <View className="flex-1 h-px bg-gray-300" />
       </View>
 
@@ -79,7 +79,7 @@ const LoginScreen = () => {
       </View>
 
       <Text className="text-gray-500">
-        Du hast keine Account?{" "}
+        Du hast noch keinen Account?{" "}
         <Link href="/pages/register" className="text-[#7C5CFC] font-semibold">
           Jetzt Registrieren
         </Link>
