@@ -5,45 +5,138 @@ import {
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
+  Modal,
+  Pressable,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useProduct } from "@/hook/useProduct"; // Import the hook
+import { useProduct } from "@/hook/useProduct";
+import Slider from "@react-native-community/slider";
+
+interface FilterState {
+  minPrice: number | null;
+  maxPrice: number | null;
+  minDeposit: number | null;
+  maxDeposit: number | null;
+  minDeliveryCost: number | null;
+  maxDeliveryCost: number | null;
+}
 
 const SearchScreen = () => {
   const router = useRouter();
   const { products, loading, error, getAllProducts } = useProduct();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<typeof products>([]);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [filterValues, setFilterValues] = useState<FilterState>({
+    minPrice: null,
+    maxPrice: null,
+    minDeposit: null,
+    maxDeposit: null,
+    minDeliveryCost: null,
+    maxDeliveryCost: null,
+  });
 
   useEffect(() => {
     getAllProducts();
   }, [getAllProducts]);
 
   useEffect(() => {
+    applyFilters();
+  }, [searchText, products, filterValues]);
+
+  const applyFilters = useCallback(() => {
+    let filteredProducts = products;
+
     if (searchText) {
-      const results = products.filter(
+      filteredProducts = filteredProducts.filter(
         (product) =>
           product.name?.toLowerCase().includes(searchText.toLowerCase()) ||
           product.description?.toLowerCase().includes(searchText.toLowerCase())
       );
-      setSearchResults(results);
-    } else {
-      setSearchResults(products);
     }
-  }, [searchText, products]);
+
+    if (filterValues.minPrice !== null) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price >= filterValues.minPrice
+      );
+    }
+
+    if (filterValues.maxPrice !== null) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price <= filterValues.maxPrice
+      );
+    }
+
+    if (
+      filterValues.minDeposit !== null &&
+      filterValues.minDeposit !== undefined
+    ) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.deposit >= filterValues.minDeposit
+      );
+    }
+
+    if (
+      filterValues.maxDeposit !== null &&
+      filterValues.maxDeposit !== undefined
+    ) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.deposit <= filterValues.maxDeposit
+      );
+    }
+
+    if (
+      filterValues.minDeliveryCost !== null &&
+      filterValues.minDeliveryCost !== undefined
+    ) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.deliveryCost >= filterValues.minDeliveryCost
+      );
+    }
+
+    if (
+      filterValues.maxDeliveryCost !== null &&
+      filterValues.maxDeliveryCost !== undefined
+    ) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.deliveryCost <= filterValues.maxDeliveryCost
+      );
+    }
+
+    setSearchResults(filteredProducts);
+  }, [searchText, products, filterValues]);
 
   const handleSearch = useCallback(() => {
-    // The filtering is already done in the useEffect above,
-    // so no need for a separate loading state here for the basic search.
-    console.log("Searching for:", searchText);
+    console.log("Suche nach:", searchText);
+    // Filtering is handled in the useEffect and applyFilters
   }, [searchText]);
 
-  const handleFilter = () => {
-    console.log("Navigating to filters");
-    // Implement navigation to filter screen if needed
+  const openFilterModal = () => {
+    setIsFilterModalVisible(true);
+  };
+
+  const closeFilterModal = () => {
+    setIsFilterModalVisible(false);
+  };
+
+  const resetFilters = () => {
+    setFilterValues({
+      minPrice: null,
+      maxPrice: null,
+      minDeposit: null,
+      maxDeposit: null,
+      minDeliveryCost: null,
+      maxDeliveryCost: null,
+    });
+  };
+
+  const applyFilterButton = () => {
+    applyFilters();
+    closeFilterModal();
   };
 
   const navigateToDetails = (productId: string) => {
@@ -60,7 +153,9 @@ const SearchScreen = () => {
     return (
       <View className="flex-1 bg-background pt-20 justify-center items-center">
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text className="mt-2 text-textSecondary">Lade Produkte...</Text>
+        <Text className="mt-2 text-textSecondary">
+          Produkte werden geladen...
+        </Text>
       </View>
     );
   }
@@ -82,14 +177,14 @@ const SearchScreen = () => {
           <View className="flex-1 bg-white rounded-lg shadow-sm">
             <TextInput
               className="w-full p-3 text-lg text-textPrimary"
-              placeholder="Suche..."
+              placeholder="Suchen..."
               value={searchText}
               onChangeText={setSearchText}
               onSubmitEditing={handleSearch}
             />
           </View>
           <TouchableOpacity
-            onPress={handleFilter}
+            onPress={openFilterModal}
             className="bg-black rounded-lg p-3 ml-4 shadow-md"
           >
             <Feather name="filter" size={24} color="white" />
@@ -139,6 +234,158 @@ const SearchScreen = () => {
           )}
         </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isFilterModalVisible}
+        onRequestClose={closeFilterModal}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white p-6 rounded-t-xl shadow-md">
+            <Text className="text-xl font-bold mb-4">Filteroptionen</Text>
+
+            <ScrollView>
+              {/* Preis Filter */}
+              <View className="mb-4">
+                <Text className="text-lg font-semibold mb-2">Preis (€)</Text>
+                <View className="flex-row items-center space-x-2">
+                  <TextInput
+                    className="flex-1 bg-gray-100 rounded-md p-2 text-sm"
+                    placeholder="Min."
+                    keyboardType="numeric"
+                    value={
+                      filterValues.minPrice !== null
+                        ? String(filterValues.minPrice)
+                        : ""
+                    }
+                    onChangeText={(text) =>
+                      setFilterValues((prev) => ({
+                        ...prev,
+                        minPrice: text ? parseInt(text, 10) : null,
+                      }))
+                    }
+                  />
+                  <Text>-</Text>
+                  <TextInput
+                    className="flex-1 bg-gray-100 rounded-md p-2 text-sm"
+                    placeholder="Max."
+                    keyboardType="numeric"
+                    value={
+                      filterValues.maxPrice !== null
+                        ? String(filterValues.maxPrice)
+                        : ""
+                    }
+                    onChangeText={(text) =>
+                      setFilterValues((prev) => ({
+                        ...prev,
+                        maxPrice: text ? parseInt(text, 10) : null,
+                      }))
+                    }
+                  />
+                </View>
+              </View>
+
+              {/* Kaution Filter */}
+              <View className="mb-4">
+                <Text className="text-lg font-semibold mb-2">Kaution (€)</Text>
+                <View className="flex-row items-center space-x-2">
+                  <TextInput
+                    className="flex-1 bg-gray-100 rounded-md p-2 text-sm"
+                    placeholder="Min."
+                    keyboardType="numeric"
+                    value={
+                      filterValues.minDeposit !== null
+                        ? String(filterValues.minDeposit)
+                        : ""
+                    }
+                    onChangeText={(text) =>
+                      setFilterValues((prev) => ({
+                        ...prev,
+                        minDeposit: text ? parseInt(text, 10) : null,
+                      }))
+                    }
+                  />
+                  <Text>-</Text>
+                  <TextInput
+                    className="flex-1 bg-gray-100 rounded-md p-2 text-sm"
+                    placeholder="Max."
+                    keyboardType="numeric"
+                    value={
+                      filterValues.maxDeposit !== null
+                        ? String(filterValues.maxDeposit)
+                        : ""
+                    }
+                    onChangeText={(text) =>
+                      setFilterValues((prev) => ({
+                        ...prev,
+                        maxDeposit: text ? parseInt(text, 10) : null,
+                      }))
+                    }
+                  />
+                </View>
+              </View>
+
+              {/* Lieferkosten Filter */}
+              <View className="mb-4">
+                <Text className="text-lg font-semibold mb-2">
+                  Lieferkosten (€)
+                </Text>
+                <View className="flex-row items-center space-x-2">
+                  <TextInput
+                    className="flex-1 bg-gray-100 rounded-md p-2 text-sm"
+                    placeholder="Min."
+                    keyboardType="numeric"
+                    value={
+                      filterValues.minDeliveryCost !== null
+                        ? String(filterValues.minDeliveryCost)
+                        : ""
+                    }
+                    onChangeText={(text) =>
+                      setFilterValues((prev) => ({
+                        ...prev,
+                        minDeliveryCost: text ? parseInt(text, 10) : null,
+                      }))
+                    }
+                  />
+                  <Text>-</Text>
+                  <TextInput
+                    className="flex-1 bg-gray-100 rounded-md p-2 text-sm"
+                    placeholder="Max."
+                    keyboardType="numeric"
+                    value={
+                      filterValues.maxDeliveryCost !== null
+                        ? String(filterValues.maxDeliveryCost)
+                        : ""
+                    }
+                    onChangeText={(text) =>
+                      setFilterValues((prev) => ({
+                        ...prev,
+                        maxDeliveryCost: text ? parseInt(text, 10) : null,
+                      }))
+                    }
+                  />
+                </View>
+              </View>
+            </ScrollView>
+
+            <View className="flex flex-row justify-end mt-6 space-x-4">
+              <TouchableOpacity
+                onPress={resetFilters}
+                className="py-2 px-4 rounded-md"
+              >
+                <Text className="text-textSecondary">Zurücksetzen</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={applyFilterButton}
+                className="bg-primary py-2 px-4 rounded-md"
+              >
+                <Text className="text-white">Anwenden</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
