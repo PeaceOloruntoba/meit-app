@@ -21,7 +21,7 @@
         "origin": "https://n"
       },
       "eas": {
-        "projectId": "45bb3aca-7a05-4c57-8ebf-e989320c8c51"
+        "projectId": "07155bd4-0356-43cb-a5be-12a2dd4f65df"
       }
     },
     "android": {
@@ -29,9 +29,6 @@
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/45bb3aca-7a05-4c57-8ebf-e989320c8c51"
     },
     "ios": {}
   }
