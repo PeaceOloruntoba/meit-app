@@ -6,12 +6,16 @@ import { useAuth } from "@/hook/useAuth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { toast } from "sonner-native";
+import CryptoJS from "crypto-js"; // Importiere CryptoJS
 
 interface BankDetails {
   accountNumber: string;
-  bankCode: string;
+  bankCode: string; // Optional: Kann je nach Land variieren (z.B. IBAN, SWIFT)
   accountHolderName: string;
 }
+
+const RAPYD_API_KEY = "DEINE_RAPYD_API_KEY"; // Ersetze durch deinen öffentlichen API-Schlüssel
+const RAPYD_SECRET_KEY = "DEIN_RAPYD_SECRET_KEY"; // **NIEMALS IM FRONTEND SPEICHERN - NUR FÜR DEMO**
 
 export default function WalletScreen() {
   const { user } = useAuth();
@@ -64,24 +68,28 @@ export default function WalletScreen() {
 
     setIsWithdrawing(true);
     try {
-      // Hier rufst du deinen Backend-Endpunkt auf, der die Rapyd-Auszahlung veranlasst.
-      const response = await fetch("/api/rapyd-payout", {
+      const requestBody = {
+        amount: amountToWithdraw,
+        currency: "EUR", // Hardcoded für Deutschland, anpassen falls nötig
+        beneficiary: {
+          name: bankDetails.accountHolderName,
+          bank_account: bankDetails.accountNumber,
+          // bank_code: bankDetails.bankCode, // Füge Bankleitzahl/IBAN/SWIFT je nach Bedarf hinzu
+          country: "DE", // Hardcoded für Deutschland, anpassen falls nötig
+          // Weitere Details je nach Rapyd Payout API
+        },
+        ewallet: user.uid, // Optional: Wenn du Rapyd eWallets verwendest
+      };
+
+      const response = await fetch("https://sandboxapi.rapyd.net/v2/payouts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          access_key: RAPYD_API_KEY,
+          signature: generateRapydSignature("post", "/v2/payouts", requestBody),
+          timestamp: Math.floor(Date.now() / 1000).toString(),
         },
-        body: JSON.stringify({
-          amount: amountToWithdraw,
-          currency: "EUR", // Hardcoded für Deutschland, anpassen falls nötig
-          beneficiary: {
-            name: bankDetails.accountHolderName,
-            bank_account: bankDetails.accountNumber,
-            // bank_code: bankDetails.bankCode, // Füge Bankleitzahl/IBAN/SWIFT je nach Bedarf hinzu
-            country: "DE", // Hardcoded für Deutschland, anpassen falls nötig
-            // Weitere Details je nach Rapyd Payout API
-          },
-          ewallet: user.uid, // Optional: Wenn du Rapyd eWallets verwendest
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -120,6 +128,26 @@ export default function WalletScreen() {
     } finally {
       setIsWithdrawing(false);
     }
+  };
+
+  // **SEHR UNSICHER - NICHT FÜR PRODUKTION**
+  const generateRapydSignature = (
+    httpMethod: string,
+    urlPath: string,
+    body: any
+  ) => {
+    const salt = Math.random().toString(36).substring(7);
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const data =
+      httpMethod.toLowerCase() +
+      urlPath +
+      salt +
+      timestamp +
+      RAPYD_API_KEY +
+      RAPYD_SECRET_KEY +
+      (body ? JSON.stringify(body) : "");
+    const hash = CryptoJS.enc.Hex.stringify(CryptoJS.SHA256(data));
+    return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(hash));
   };
 
   return (

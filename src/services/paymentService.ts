@@ -6,6 +6,7 @@ import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { useAuth } from "@/hook/useAuth";
 import { toast } from "sonner-native";
+import CryptoJS from "crypto-js"; // Importiere CryptoJS
 
 const OUR_CHARGE = 0.5; // Unsere Gebühr in EUR
 const RAPYD_API_KEY = "DEINE_RAPYD_API_KEY";
