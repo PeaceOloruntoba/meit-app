@@ -1,12 +1,19 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export default function WalletScreen() {
   return (
     <View className="flex-1 bg-[#F2F5FA] p-4 flex-col justify-between pt-20">
       <View>
-        <Text className="text-2xl font-semibold mb-4">Wallet</Text>
-        <Text className="text-xl font-semibold mb-4">Miet Payments</Text>
+        <TouchableOpacity onPress={() => router.back()} className="mb-4">
+          <Feather name="arrow-left" size={24} color="#374151" />
+        </TouchableOpacity>
+        <Text className="text-2xl font-semibold mb-2">
+          Wallet{" "}
+          <Text className="text-xl font-semibold mb-4">Miet Payments</Text>
+        </Text>
         <View className="flex flex-row items-center justify-between mt-6">
           <Text className="text-lg">Account Balance</Text>
           <Text className="text-5xl font-semibold">€ 5000.00</Text>
