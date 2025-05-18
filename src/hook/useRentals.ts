@@ -226,6 +226,6 @@ export const useRental = () => {
     updateRentalStatus,
     getRentalsByUserId,
     getRentalsByOwnerId,
-    getRentalById: getRentalDetails, // Rename the original getRentalById
+    getRentalById: getRentalDetails,
   };
 };
