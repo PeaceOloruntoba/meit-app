@@ -75,8 +75,7 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => {
-          }}
+          onPress={() => {}}
           className="flex-row items-center justify-between px-5 py-4 bg-white mb-1 rounded-md"
         >
           <Text className="text-lg text-gray-800">Impressum</Text>
@@ -84,11 +83,18 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => {
-          }}
+          onPress={() => {}}
           className="flex-row items-center justify-between px-5 py-4 bg-white mb-1 rounded-md"
         >
           <Text className="text-lg text-gray-800">Rechtliches</Text>
+          <Feather name="chevron-right" size={20} color="#888" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push("/pages/profile/wallet")}
+          className="flex-row items-center justify-between px-5 py-4 bg-white mb-1 rounded-md"
+        >
+          <Text className="text-lg text-gray-800">Payments</Text>
           <Feather name="chevron-right" size={20} color="#888" />
         </TouchableOpacity>
       </View>
@@ -139,7 +145,9 @@ const ProfileScreen = () => {
                 className="bg-red-600 text-white px-4 py-2 rounded-md"
                 disabled={loading}
               >
-                <Text className="text-white">{loading ? "Löschen..." : "Konto löschen"}</Text>
+                <Text className="text-white">
+                  {loading ? "Löschen..." : "Konto löschen"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
