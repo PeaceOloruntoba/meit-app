@@ -1,20 +1,16 @@
-import {
-  initializeCheckout,
-  RapydCheckout,
-} from "@rapyd/react-native-checkout"; // Oder dein gewähltes Rapyd Frontend SDK
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { useAuth } from "@/hook/useAuth";
 import { toast } from "sonner-native";
-import CryptoJS from "crypto-js"; // Importiere CryptoJS
+import CryptoJS from "crypto-js";
 
-const OUR_CHARGE = 0.5; // Unsere Gebühr in EUR
-const RAPYD_API_KEY = "DEINE_RAPYD_API_KEY";
-const RAPYD_SECRET_KEY = "DEIN_RAPYD_SECRET_KEY";
+const OUR_CHARGE = 0.5;
+const RAPYD_API_KEY = "rak_6550D3010117173AFCAF";
+const RAPYD_SECRET_KEY =
+  "rsk_0b7ceb3ed3512bf7ccf2aa79af9bb50edcac83a872c9ed9ff4f5bab889c65f609be7a8940c125742";
 
 interface RapydCheckoutData {
   sessionId: string;
-  // Füge weitere benötigte Felder hinzu
 }
 
 const PaymentService = () => {
@@ -26,44 +22,54 @@ const PaymentService = () => {
     metadata: any
   ): Promise<RapydCheckoutData | null> => {
     if (!user?.uid) {
-      toast.error("Nicht authentifiziert.");
+      toast.error("Not authenticated.");
       return null;
     }
     try {
+      const httpMethod = "post";
+      const urlPath = "/v2/checkout";
+      const salt = Math.random().toString(36).substring(7);
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const body = {
+        amount: amount,
+        currency: currency,
+        payment_method_options: {
+          card: {
+            request_three_d_secure: "auto",
+          },
+        },
+        metadata: { ...metadata, userId: user.uid },
+      };
+      const dataToSign =
+        httpMethod.toLowerCase() +
+        urlPath +
+        salt +
+        timestamp +
+        RAPYD_API_KEY +
+        RAPYD_SECRET_KEY +
+        JSON.stringify(body);
+      const hash = CryptoJS.enc.Hex.stringify(CryptoJS.SHA256(dataToSign));
+      const signature = CryptoJS.enc.Base64.stringify(
+        CryptoJS.enc.Utf8.parse(hash)
+      );
+
       const response = await fetch("https://sandboxapi.rapyd.net/v2/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           access_key: RAPYD_API_KEY,
-          signature: generateRapydSignature("post", "/v2/checkout", {
-            amount: amount,
-            currency: currency,
-            payment_method_options: {
-              card: {
-                request_three_d_secure: "auto",
-              },
-            },
-            metadata: { ...metadata, userId: user.uid },
-          }),
-          timestamp: Math.floor(Date.now() / 1000).toString(),
+          signature: signature,
+          timestamp: timestamp,
+          salt: salt,
         },
-        body: JSON.stringify({
-          amount: amount,
-          currency: currency,
-          payment_method_options: {
-            card: {
-              request_three_d_secure: "auto",
-            },
-          },
-          metadata: { ...metadata, userId: user.uid },
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         toast.error(
-          `Zahlung konnte nicht initialisiert werden: ${
-            errorData.message || "Ein Fehler ist aufgetreten."
+          `Payment initiation failed: ${
+            errorData.message || "An error occurred."
           }`
         );
         return null;
@@ -72,10 +78,10 @@ const PaymentService = () => {
       const data: RapydCheckoutData = await response.json();
       return data;
     } catch (error: any) {
-      console.error("Fehler beim Initialisieren der Zahlung:", error);
+      console.error("Error initiating payment:", error);
       toast.error(
-        `Fehler beim Initialisieren der Zahlung: ${
-          error.message || "Ein unerwarteter Fehler ist aufgetreten."
+        `Error initiating payment: ${
+          error.message || "An unexpected error occurred."
         }`
       );
       return null;
@@ -88,15 +94,13 @@ const PaymentService = () => {
     amount: number
   ) => {
     if (!user?.uid) {
-      toast.error("Nicht authentifiziert.");
+      toast.error("Not authenticated.");
       return;
     }
     try {
-      // 1. Aktualisiere den Zahlungsstatus der Miete in Firebase
       const rentalDocRef = doc(db, "rentals", rentalId);
       await updateDoc(rentalDocRef, { paymentStatus: "paid" });
 
-      // 2. Erhöhe den Kontostand des Vermieters in Firebase
       const ownerDocRef = doc(db, "users", ownerId);
       const ownerSnap = await getDoc(ownerDocRef);
       const currentBalance = ownerSnap.data()?.accountBalance || 0;
@@ -104,38 +108,15 @@ const PaymentService = () => {
         accountBalance: currentBalance + amount - OUR_CHARGE,
       });
 
-      toast.success("Zahlung erfolgreich!");
+      toast.success("Payment successful!");
     } catch (error: any) {
-      console.error(
-        "Fehler beim Verarbeiten der erfolgreichen Zahlung:",
-        error
-      );
+      console.error("Error processing successful payment:", error);
       toast.error(
-        `Fehler beim Verarbeiten der Zahlung: ${
-          error.message || "Ein unerwarteter Fehler ist aufgetreten."
+        `Error processing payment: ${
+          error.message || "An unexpected error occurred."
         }`
       );
     }
-  };
-
-  // **UNSICHER - NICHT FÜR PRODUKTION**
-  const generateRapydSignature = (
-    httpMethod: string,
-    urlPath: string,
-    body: any
-  ) => {
-    const salt = Math.random().toString(36).substring(7);
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const data =
-      httpMethod.toLowerCase() +
-      urlPath +
-      salt +
-      timestamp +
-      RAPYD_API_KEY +
-      RAPYD_SECRET_KEY +
-      (body ? JSON.stringify(body) : "");
-    const hash = CryptoJS.enc.Hex.stringify(CryptoJS.SHA256(data));
-    return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(hash));
   };
 
   return {
