@@ -5,9 +5,8 @@ import { toast } from "sonner-native";
 import CryptoJS from "crypto-js";
 
 const OUR_CHARGE = 0.5;
-const RAPYD_API_KEY = "rak_6550D3010117173AFCAF";
-const RAPYD_SECRET_KEY =
-  "rsk_0b7ceb3ed3512bf7ccf2aa79af9bb50edcac83a872c9ed9ff4f5bab889c65f609be7a8940c125742";
+const RAPYD_API_KEY = "YOUR_RAPYD_API_KEY";
+const RAPYD_SECRET_KEY = "YOUR_RAPYD_SECRET_KEY";
 
 interface RapydCheckoutData {
   sessionId: string;
@@ -22,7 +21,7 @@ const PaymentService = () => {
     metadata: any
   ): Promise<RapydCheckoutData | null> => {
     if (!user?.uid) {
-      toast.error("Not authenticated.");
+      toast.error("Nicht authentifiziert.");
       return null;
     }
     try {
@@ -68,8 +67,8 @@ const PaymentService = () => {
       if (!response.ok) {
         const errorData = await response.json();
         toast.error(
-          `Payment initiation failed: ${
-            errorData.message || "An error occurred."
+          `Zahlung konnte nicht eingeleitet werden: ${
+            errorData.message || "Ein Fehler ist aufgetreten."
           }`
         );
         return null;
@@ -80,8 +79,8 @@ const PaymentService = () => {
     } catch (error: any) {
       console.error("Error initiating payment:", error);
       toast.error(
-        `Error initiating payment: ${
-          error.message || "An unexpected error occurred."
+        `Fehler beim Einleiten der Zahlung: ${
+          error.message || "Ein unerwarteter Fehler ist aufgetreten."
         }`
       );
       return null;
@@ -94,13 +93,12 @@ const PaymentService = () => {
     amount: number
   ) => {
     if (!user?.uid) {
-      toast.error("Not authenticated.");
+      toast.error("Nicht authentifiziert.");
       return;
     }
     try {
       const rentalDocRef = doc(db, "rentals", rentalId);
       await updateDoc(rentalDocRef, { paymentStatus: "paid" });
-
       const ownerDocRef = doc(db, "users", ownerId);
       const ownerSnap = await getDoc(ownerDocRef);
       const currentBalance = ownerSnap.data()?.accountBalance || 0;
@@ -108,14 +106,14 @@ const PaymentService = () => {
         accountBalance: currentBalance + amount - OUR_CHARGE,
       });
 
-      toast.success("Payment successful!");
+      toast.success("Zahlung erfolgreich!");
     } catch (error: any) {
       console.error("Error processing successful payment:", error);
       toast.error(
-        `Error processing payment: ${
-          error.message || "An unexpected error occurred."
+        `Fehler beim Verarbeiten der erfolgreichen Zahlung: ${
+          error.message || "Ein unerwarteter Fehler ist aufgetreten."
         }`
-      );
+      ); // German
     }
   };
 
