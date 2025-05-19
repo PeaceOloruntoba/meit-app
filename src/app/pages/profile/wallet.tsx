@@ -6,16 +6,17 @@ import { useAuth } from "@/hook/useAuth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "firebaseConfig";
 import { toast } from "sonner-native";
-import CryptoJS from "crypto-js"; // Importiere CryptoJS
+import CryptoJS from "crypto-js";
 
 interface BankDetails {
   accountNumber: string;
-  bankCode: string; // Optional: Kann je nach Land variieren (z.B. IBAN, SWIFT)
+  bankCode: string;
   accountHolderName: string;
 }
 
-const RAPYD_API_KEY = "DEINE_RAPYD_API_KEY"; // Ersetze durch deinen öffentlichen API-Schlüssel
-const RAPYD_SECRET_KEY = "DEIN_RAPYD_SECRET_KEY"; // **NIEMALS IM FRONTEND SPEICHERN - NUR FÜR DEMO**
+const RAPYD_API_KEY = "rak_6550D3010117173AFCAF";
+const RAPYD_SECRET_KEY =
+  "rsk_0b7ceb3ed3512bf7ccf2aa79af9bb50edcac83a872c9ed9ff4f5bab889c65f609be7a8940c125742";
 
 export default function WalletScreen() {
   const { user } = useAuth();
@@ -45,49 +46,65 @@ export default function WalletScreen() {
 
   const handleWithdraw = async () => {
     if (!user?.uid) {
-      toast.error("Nicht authentifiziert.");
+      toast.error("Not authenticated.");
       return;
     }
 
     const amountToWithdraw = parseFloat(withdrawalAmount);
 
     if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
-      toast.error("Bitte gib einen gültigen Auszahlungsbetrag ein.");
+      toast.error("Please enter a valid withdrawal amount.");
       return;
     }
 
     if (amountToWithdraw > accountBalance) {
-      toast.error("Der Auszahlungsbetrag übersteigt dein Guthaben.");
+      toast.error("The withdrawal amount exceeds your balance.");
       return;
     }
 
     if (!bankDetails.accountNumber || !bankDetails.accountHolderName) {
-      toast.error("Bitte gib deine Bankdaten vollständig an.");
+      toast.error("Please provide your complete bank details.");
       return;
     }
 
     setIsWithdrawing(true);
     try {
+      const httpMethod = "post";
+      const urlPath = "/v2/payouts";
+      const salt = Math.random().toString(36).substring(7);
+      const timestamp = Math.floor(Date.now() / 1000).toString();
       const requestBody = {
         amount: amountToWithdraw,
-        currency: "EUR", // Hardcoded für Deutschland, anpassen falls nötig
+        currency: "EUR",
         beneficiary: {
           name: bankDetails.accountHolderName,
           bank_account: bankDetails.accountNumber,
-          // bank_code: bankDetails.bankCode, // Füge Bankleitzahl/IBAN/SWIFT je nach Bedarf hinzu
-          country: "DE", // Hardcoded für Deutschland, anpassen falls nötig
-          // Weitere Details je nach Rapyd Payout API
+          country: "DE",
         },
-        ewallet: user.uid, // Optional: Wenn du Rapyd eWallets verwendest
+        ewallet: user.uid,
       };
+
+      const dataToSign =
+        httpMethod.toLowerCase() +
+        urlPath +
+        salt +
+        timestamp +
+        RAPYD_API_KEY +
+        RAPYD_SECRET_KEY +
+        JSON.stringify(requestBody);
+      const hash = CryptoJS.enc.Hex.stringify(CryptoJS.SHA256(dataToSign));
+      const signature = CryptoJS.enc.Base64.stringify(
+        CryptoJS.enc.Utf8.parse(hash)
+      );
 
       const response = await fetch("https://sandboxapi.rapyd.net/v2/payouts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           access_key: RAPYD_API_KEY,
-          signature: generateRapydSignature("post", "/v2/payouts", requestBody),
-          timestamp: Math.floor(Date.now() / 1000).toString(),
+          signature: signature,
+          timestamp: timestamp,
+          salt: salt,
         },
         body: JSON.stringify(requestBody),
       });
@@ -95,21 +112,17 @@ export default function WalletScreen() {
       if (!response.ok) {
         const errorData = await response.json();
         toast.error(
-          `Auszahlung fehlgeschlagen: ${
-            errorData.message || "Ein Fehler ist aufgetreten."
-          }`
+          `Payout failed: ${errorData.message || "An error occurred."}`
         );
         return;
       }
-
-      // Auszahlung erfolgreich, aktualisiere den Kontostand in Firebase
       const userDocRef = doc(db, "users", user.uid);
       await updateDoc(userDocRef, {
         accountBalance: accountBalance - amountToWithdraw,
       });
       setAccountBalance(accountBalance - amountToWithdraw);
       toast.success(
-        `Auszahlung von €${amountToWithdraw.toFixed(2)} erfolgreich.`
+        `Withdrawal of €${amountToWithdraw.toFixed(2)} successful.`
       );
       setIsWithdrawModalVisible(false);
       setWithdrawalAmount("");
@@ -119,35 +132,15 @@ export default function WalletScreen() {
         accountHolderName: "",
       });
     } catch (error: any) {
-      console.error("Fehler bei der Auszahlung:", error);
+      console.error("Error during withdrawal:", error);
       toast.error(
-        `Fehler bei der Auszahlung: ${
-          error.message || "Ein unerwarteter Fehler ist aufgetreten."
+        `Error during withdrawal: ${
+          error.message || "An unexpected error occurred."
         }`
       );
     } finally {
       setIsWithdrawing(false);
     }
-  };
-
-  // **SEHR UNSICHER - NICHT FÜR PRODUKTION**
-  const generateRapydSignature = (
-    httpMethod: string,
-    urlPath: string,
-    body: any
-  ) => {
-    const salt = Math.random().toString(36).substring(7);
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const data =
-      httpMethod.toLowerCase() +
-      urlPath +
-      salt +
-      timestamp +
-      RAPYD_API_KEY +
-      RAPYD_SECRET_KEY +
-      (body ? JSON.stringify(body) : "");
-    const hash = CryptoJS.enc.Hex.stringify(CryptoJS.SHA256(data));
-    return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(hash));
   };
 
   return (
@@ -161,7 +154,7 @@ export default function WalletScreen() {
           <Text className="text-xl font-semibold mb-4">Miet Payments</Text>
         </Text>
         <View className="flex flex-row items-center justify-between mt-6">
-          <Text className="text-lg">Kontostand</Text>
+          <Text className="text-lg">Account Balance</Text>
           <Text className="text-5xl font-semibold">
             € {accountBalance.toFixed(2)}
           </Text>
@@ -172,7 +165,7 @@ export default function WalletScreen() {
           disabled={isWithdrawing}
         >
           <Text className="text-white font-semibold text-xl uppercase">
-            {isWithdrawing ? "Auszahlung läuft..." : "Auszahlen"}
+            {isWithdrawing ? "Withdrawing..." : "Withdraw"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -187,16 +180,16 @@ export default function WalletScreen() {
       >
         <View className="flex-1 justify-center items-center bg-black/50">
           <View className="bg-white p-6 rounded-lg w-4/5">
-            <Text className="text-xl font-semibold mb-4">Auszahlung</Text>
+            <Text className="text-xl font-semibold mb-4">Withdrawal</Text>
             <TextInput
-              placeholder="Auszahlungsbetrag"
+              placeholder="Withdrawal Amount"
               value={withdrawalAmount}
               onChangeText={setWithdrawalAmount}
               keyboardType="numeric"
               className="border p-2 mb-3 rounded-md"
             />
             <TextInput
-              placeholder="Kontonummer"
+              placeholder="Account Number"
               value={bankDetails.accountNumber}
               onChangeText={(text) =>
                 setBankDetails({ ...bankDetails, accountNumber: text })
@@ -204,28 +197,27 @@ export default function WalletScreen() {
               className="border p-2 mb-3 rounded-md"
             />
             <TextInput
-              placeholder="Name des Kontoinhabers"
+              placeholder="Account Holder Name"
               value={bankDetails.accountHolderName}
               onChangeText={(text) =>
                 setBankDetails({ ...bankDetails, accountHolderName: text })
               }
               className="border p-2 mb-3 rounded-md"
             />
-            {/* Optional: Feld für Bankleitzahl/IBAN/SWIFT */}
             <View className="flex flex-row justify-end mt-4">
               <TouchableOpacity
                 className="bg-gray-300 py-2 px-4 rounded-md mr-2"
                 onPress={() => setIsWithdrawModalVisible(false)}
                 disabled={isWithdrawing}
               >
-                <Text>Abbrechen</Text>
+                <Text>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className="bg-blue-600 py-2 px-4 rounded-md"
                 onPress={handleWithdraw}
                 disabled={isWithdrawing}
               >
-                <Text className="text-white">Auszahlen</Text>
+                <Text className="text-white">Withdraw</Text>
               </TouchableOpacity>
             </View>
           </View>
