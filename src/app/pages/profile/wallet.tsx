@@ -1,12 +1,8 @@
-import { View, Text, TouchableOpacity, Modal, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, Modal, TextInput, GestureResponderEvent } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useAuth } from "@/hook/useAuth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "firebaseConfig";
-import { toast } from "sonner-native";
-import CryptoJS from "crypto-js";
 
 interface BankDetails {
   accountNumber: string;
@@ -14,134 +10,24 @@ interface BankDetails {
   accountHolderName: string;
 }
 
-const RAPYD_API_KEY = "rak_6550D3010117173AFCAF";
-const RAPYD_SECRET_KEY =
-  "rsk_0b7ceb3ed3512bf7ccf2aa79af9bb50edcac83a872c9ed9ff4f5bab889c65f609be7a8940c125742";
 
 export default function WalletScreen() {
-  const { user } = useAuth();
-  const [accountBalance, setAccountBalance] = useState<number>(0);
-  const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
-  const [withdrawalAmount, setWithdrawalAmount] = useState<string>("");
-  const [bankDetails, setBankDetails] = useState<BankDetails>({
-    accountNumber: "",
-    bankCode: "",
-    accountHolderName: "",
-  });
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (user?.uid) {
-        const userDocRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userDocRef);
-        if (docSnap.exists()) {
-          setAccountBalance(docSnap.data()?.accountBalance || 0);
-        }
-      }
-    };
+  function setIsWithdrawModalVisible(arg0: boolean): void {
+    throw new Error("Function not implemented.");
+  }
 
-    fetchBalance();
-  }, [user?.uid]);
+  function setWithdrawalAmount(text: string): void {
+    throw new Error("Function not implemented.");
+  }
 
-  const handleWithdraw = async () => {
-    if (!user?.uid) {
-      toast.error("Not authenticated.");
-      return;
-    }
+  function setBankDetails(arg0: any): void {
+    throw new Error("Function not implemented.");
+  }
 
-    const amountToWithdraw = parseFloat(withdrawalAmount);
-
-    if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
-      toast.error("Please enter a valid withdrawal amount.");
-      return;
-    }
-
-    if (amountToWithdraw > accountBalance) {
-      toast.error("The withdrawal amount exceeds your balance.");
-      return;
-    }
-
-    if (!bankDetails.accountNumber || !bankDetails.accountHolderName) {
-      toast.error("Please provide your complete bank details.");
-      return;
-    }
-
-    setIsWithdrawing(true);
-    try {
-      const httpMethod = "post";
-      const urlPath = "/v2/payouts";
-      const salt = Math.random().toString(36).substring(7);
-      const timestamp = Math.floor(Date.now() / 1000).toString();
-      const requestBody = {
-        amount: amountToWithdraw,
-        currency: "EUR",
-        beneficiary: {
-          name: bankDetails.accountHolderName,
-          bank_account: bankDetails.accountNumber,
-          country: "DE",
-        },
-        ewallet: user.uid,
-      };
-
-      const dataToSign =
-        httpMethod.toLowerCase() +
-        urlPath +
-        salt +
-        timestamp +
-        RAPYD_API_KEY +
-        RAPYD_SECRET_KEY +
-        JSON.stringify(requestBody);
-      const hash = CryptoJS.enc.Hex.stringify(CryptoJS.SHA256(dataToSign));
-      const signature = CryptoJS.enc.Base64.stringify(
-        CryptoJS.enc.Utf8.parse(hash)
-      );
-
-      const response = await fetch("https://sandboxapi.rapyd.net/v2/payouts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          access_key: RAPYD_API_KEY,
-          signature: signature,
-          timestamp: timestamp,
-          salt: salt,
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(
-          `Payout failed: ${errorData.message || "An error occurred."}`
-        );
-        return;
-      }
-      const userDocRef = doc(db, "users", user.uid);
-      await updateDoc(userDocRef, {
-        accountBalance: accountBalance - amountToWithdraw,
-      });
-      setAccountBalance(accountBalance - amountToWithdraw);
-      toast.success(
-        `Withdrawal of €${amountToWithdraw.toFixed(2)} successful.`
-      );
-      setIsWithdrawModalVisible(false);
-      setWithdrawalAmount("");
-      setBankDetails({
-        accountNumber: "",
-        bankCode: "",
-        accountHolderName: "",
-      });
-    } catch (error: any) {
-      console.error("Error during withdrawal:", error);
-      toast.error(
-        `Error during withdrawal: ${
-          error.message || "An unexpected error occurred."
-        }`
-      );
-    } finally {
-      setIsWithdrawing(false);
-    }
-  };
+  function handleWithdraw(event: GestureResponderEvent): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <View className="flex-1 bg-[#F2F5FA] p-4 flex-col justify-between pt-20">
@@ -156,7 +42,7 @@ export default function WalletScreen() {
         <View className="flex flex-row items-center justify-between mt-6">
           <Text className="text-lg">Account Balance</Text>
           <Text className="text-5xl font-semibold">
-            € {accountBalance.toFixed(2)}
+            €0.00
           </Text>
         </View>
         <TouchableOpacity
