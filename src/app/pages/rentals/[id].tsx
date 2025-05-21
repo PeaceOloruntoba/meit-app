@@ -44,11 +44,12 @@ const RentalDetailsScreen = () => {
     loading: rentalLoading,
     error: rentalError,
     getRentalById,
+    updateRentalPaymentStatus, // This is the function we'll call
     updateRentalStatus,
   } = useRental();
 
   const { getPaymentIntentClientSecret } = usePayments();
-  const { confirmPayment } = useStripe(); // useStripe hook
+  const { confirmPayment } = useStripe();
 
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
@@ -94,13 +95,10 @@ const RentalDetailsScreen = () => {
       }
 
       // 2. Confirm the Payment with @stripe/stripe-react-native's confirmPayment
-      // Crucially, we need to tell confirmPayment to use the card details from CardField.
       const { error: confirmError, paymentIntent } = await confirmPayment(
         clientSecret,
         {
-          paymentMethodType: "Card", // Specify the payment method type
-          // No need to pass card details directly, CardField handles it.
-          // The CardField component is implicitly linked to this confirmPayment call.
+          paymentMethodType: "Card", // Specify the payment method type for CardField
         }
       );
 
@@ -111,17 +109,24 @@ const RentalDetailsScreen = () => {
         return;
       }
 
-      if (!paymentIntent || paymentIntent.status !== "Succeeded") {
-        setPaymentError("Zahlung war nicht erfolgreich.");
+      // Check if paymentIntent exists and status is 'Succeeded'
+      if (paymentIntent && paymentIntent.status === "Succeeded") {
+        // 3. Payment successful on Stripe's side.
+        setPaymentSuccess(true);
+        setIsPaymentModalVisible(false); // Close modal on success
+
+        // Your requested addition: Update payment status on frontend immediately.
+        // Note: Your backend webhook will also update this, creating redundancy.
+        // This is for immediate UI feedback.
+        await updateRentalPaymentStatus(rental.id!, "paid");
+
+        // Re-fetch rental data to ensure consistency with backend (especially after webhook)
+        getRentalById(rental.id!);
+      } else {
+        setPaymentError("Zahlung war nicht erfolgreich."); // Payment was not successful.
         setIsPaying(false);
         return;
       }
-
-      // 3. Payment successful! Backend webhook will update Firebase.
-      // Just refresh local rental data to reflect the change.
-      setPaymentSuccess(true);
-      setIsPaymentModalVisible(false); // Close modal on success
-      getRentalById(rental.id!); // Re-fetch rental data to update payment status from DB
     } catch (error: any) {
       console.error("Fehler beim Bezahlen:", error);
       setPaymentError(
