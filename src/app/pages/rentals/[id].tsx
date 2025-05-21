@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Modal,
   ActivityIndicator,
-  Alert,
+  Alert, // Keep Alert for now, replace with custom modal if needed
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -48,7 +48,7 @@ const RentalDetailsScreen = () => {
     updateRentalStatus,
   } = useRental();
 
-  const { getPaymentIntentClientSecret } = usePayments();
+  const { getPaymentIntentClientSecret, updateOwnerBalance } = usePayments(); // Destructure updateOwnerBalance
   const { confirmPayment } = useStripe();
 
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
@@ -116,9 +116,12 @@ const RentalDetailsScreen = () => {
         setIsPaymentModalVisible(false); // Close modal on success
 
         // Your requested addition: Update payment status on frontend immediately.
-        // Note: Your backend webhook will also update this, creating redundancy.
-        // This is for immediate UI feedback.
         await updateRentalPaymentStatus(rental.id!, "paid");
+
+        // New: Update owner's balance on the frontend for immediate feedback
+        if (rental.ownerId) {
+          await updateOwnerBalance(rental.ownerId, rental.price);
+        }
 
         // Re-fetch rental data to ensure consistency with backend (especially after webhook)
         getRentalById(rental.id!);
