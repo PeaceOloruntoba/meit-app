@@ -100,8 +100,8 @@ const WalletScreen = () => {
                 onPress={() => setIsWithdrawModalVisible(true)}
                 className="bg-blue-600 text-white py-3 px-6 rounded-md w-full"
             >
-                <Text className="text-lg font-semibold flex items-center gap-2">
-                    Geld abheben {/* Withdraw Funds */}
+                <Text className="text-lg font-semibold flex items-center gap-2 text-white">
+                    Geld abheben
                 </Text>
             </TouchableOpacity>
 
@@ -113,7 +113,7 @@ const WalletScreen = () => {
             >
                 <View className="flex-1 justify-center items-center bg-black/50">
                     <View className="bg-white p-6 rounded-lg w-4/5">
-                        <Text className="text-xl font-semibold mb-4">Geld abheben</Text> {/* Withdraw Funds */}
+                        <Text className="text-xl font-semibold mb-4">Geld abheben</Text>
                         {withdrawError && (
                             <Text className="text-red-500 mb-4">{withdrawError}</Text>
                         )}
@@ -148,7 +148,7 @@ const WalletScreen = () => {
                             }
                             className="border border-gray-300 rounded-md p-2 mb-4"
                         />
-                        <View className="flex flex-row justify-end space-x-4">
+                        <View className="flex flex-row justify-end space-x-4 gap-4">
                             <TouchableOpacity
                                 onPress={() => setIsWithdrawModalVisible(false)}
                                 className="bg-gray-300 py-2 px-4 rounded-md"
@@ -164,7 +164,7 @@ const WalletScreen = () => {
                                 {isWithdrawing ? (
                                     <ActivityIndicator color="white" />
                                 ) : (
-                                    <Text className="text-lg">Bestätigen</Text>
+                                    <Text className="text-lg text-white">Bestätigen</Text>
                                 )}
                             </TouchableOpacity>
                         </View>
