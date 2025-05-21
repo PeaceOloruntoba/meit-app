@@ -12,7 +12,8 @@
         {
           "origin": "https://n"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "name": "miet-app",
     "slug": "miet-app",

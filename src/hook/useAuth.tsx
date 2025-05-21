@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext, useContext, useCallback } from "react";
 import { auth, db } from "../../firebaseConfig"; // Import your db instance
 import {
   createUserWithEmailAndPassword,
@@ -14,6 +14,7 @@ import { toast } from "sonner-native";
 import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { Alert } from "react-native";
 import * as WebBrowser from "expo-web-browser"; // For opening web links
+import axios from "axios";
 
 const AuthContext = createContext(null);
 
@@ -246,7 +247,7 @@ export const AuthProvider = ({ children }) => {
 
         if (result.type === "cancel") {
           toast.info("Stripe-Verbindung abgebrochen.");
-        } else if (result.type === "success") {
+        } else if (result.type == "success") {
           // The actual stripeAccountId update should ideally come from a webhook
           // or a dedicated backend endpoint that confirms the account is ready.
           // For now, we'll rely on the re-fetch above.
