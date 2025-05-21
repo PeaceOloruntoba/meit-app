@@ -1,8 +1,16 @@
-import { View, Text, TouchableOpacity, Modal, TextInput, GestureResponderEvent } from "react-native";
 import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useAuth } from "@/hook/useAuth";
+import usePayments from "@/hook/usePayment";
 
 interface BankDetails {
   accountNumber: string;
@@ -10,8 +18,19 @@ interface BankDetails {
   accountHolderName: string;
 }
 
-
-export default function WalletScreen() {
+const WalletScreen = () => {
+  const { user, updateUserBalance } = useAuth();
+  const [balance, setBalance] = useState<number>(0);
+  const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
+  const [bankDetails, setBankDetails] = useState<BankDetails>({
+    accountNumber: "",
+    bankCode: "",
+    accountHolderName: "",
+  });
+  const { withdrawFunds } = usePayments();
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
   function setIsWithdrawModalVisible(arg0: boolean): void {
     throw new Error("Function not implemented.");
@@ -30,14 +49,19 @@ export default function WalletScreen() {
   }
 
   return (
-    <View className="flex-1 bg-[#F2F5FA] p-4 flex-col justify-between pt-20">
-      <View>
-        <TouchableOpacity onPress={() => router.back()} className="mb-4">
-          <Feather name="arrow-left" size={24} color="#374151" />
-        </TouchableOpacity>
-        <Text className="text-2xl font-semibold mb-2">
-          Wallet{" "}
-          <Text className="text-xl font-semibold mb-4">Miet Payments</Text>
+    <View className="flex-1 bg-background p-4 pt-20">
+      <View className="flex flex-row gap-4">
+        <Feather name="credit-card" size={24} />
+        <Text className="text-2xl font-bold mb-4 text-textPrimary flex items-center gap-2">
+          My Wallet
+        </Text>
+      </View>
+      <View className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <Text className="text-lg font-semibold text-textPrimary">
+          Your Balance
+        </Text>
+        <Text className="text-2xl font-bold text-green-600">
+          {balance.toFixed(2)} €
         </Text>
         <View className="flex flex-row items-center justify-between mt-6">
           <Text className="text-lg">Account Balance</Text>
@@ -55,6 +79,15 @@ export default function WalletScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        onPress={() => setIsWithdrawModalVisible(true)}
+        className="bg-blue-600 text-white py-3 px-6 rounded-md w-full"
+      >
+        <Text className="text-lg font-semibold flex items-center gap-2">
+          <Feather size={20} />
+          Withdraw Funds
+        </Text>
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -111,4 +144,6 @@ export default function WalletScreen() {
       </Modal>
     </View>
   );
-}
+};
+
+export default WalletScreen;
