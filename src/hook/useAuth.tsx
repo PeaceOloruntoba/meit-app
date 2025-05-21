@@ -1,4 +1,10 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
 import { auth, db } from "../../firebaseConfig"; // Import your db instance
 import {
   createUserWithEmailAndPassword,
@@ -33,6 +39,8 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
+  // This function is less critical now as the webhook updates Firestore,
+  // and the main user object is refreshed from Firestore.
   const updateStripeAccountId = useCallback((newStripeAccountId: string) => {
     setUser((prevUser) => {
       if (!prevUser) return null;
@@ -77,6 +85,8 @@ export const AuthProvider = ({ children }) => {
         createdAt: new Date(),
         accountBalance: 0, // Initialize balance for new users
         stripeAccountId: null, // Initialize stripeAccountId as null
+        payoutsEnabled: false, // Initialize payout status
+        chargesEnabled: false, // Initialize charges status
         ...additionalData,
       });
 
@@ -223,9 +233,6 @@ export const AuthProvider = ({ children }) => {
         `${RENDER_BACKEND_URL}/api/miet-app/payments/create-account-link`,
         {
           userId: user.uid,
-          // The return_url and refresh_url will be handled by your backend.
-          // Ensure your backend's return_url points to a deep link in your app
-          // or a web page that then redirects to a deep link.
         }
       );
 
@@ -234,26 +241,33 @@ export const AuthProvider = ({ children }) => {
         // Open the Stripe onboarding URL in a web browser
         const result = await WebBrowser.openBrowserAsync(url);
 
-        // After the user completes the flow and is redirected back,
-        // you'll need a mechanism to update the user's stripeAccountId in Firebase.
-        // This is typically done via a backend webhook (account.updated event)
-        // or by checking the user's Stripe account status on return.
-        // For immediate feedback, you could re-fetch user data:
+        // After the browser is closed (either by user or redirect),
+        // re-fetch the user's data from Firestore. The backend webhook
+        // (account.updated) should have updated the stripeAccountId and
+        // payoutsEnabled status in Firestore by this point.
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
           setUser((prevUser) => ({ ...prevUser, ...userDocSnap.data() }));
         }
 
-        if (result.type === "cancel") {
+        // Provide user feedback based on browser result type, but actual Stripe status
+        // is best confirmed by the Firestore data (updated by webhook).
+        if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
           toast.info("Stripe-Verbindung abgebrochen.");
-        } else if (result.type == "success") {
-          // The actual stripeAccountId update should ideally come from a webhook
-          // or a dedicated backend endpoint that confirms the account is ready.
-          // For now, we'll rely on the re-fetch above.
-          toast.success(
-            "Stripe-Verbindung möglicherweise erfolgreich. Überprüfen Sie Ihr Profil."
-          );
+        } else if (result.type === WebBrowser.WebBrowserResultType.DISMISS) {
+          // This often means the user completed the flow or closed the browser.
+          // The Firestore re-fetch above will confirm the status.
+          // Check if stripeAccountId is now present or payoutsEnabled is true
+          if (userDocSnap.exists() && userDocSnap.data()?.payoutsEnabled) {
+            toast.success("Stripe-Konto erfolgreich verbunden!");
+          } else {
+            toast.info(
+              "Stripe-Verbindung abgeschlossen, Status wird aktualisiert."
+            );
+          }
+        } else if (result.type === WebBrowser.WebBrowserResultType.LOCKED) {
+          toast.error("Stripe-Verbindung fehlgeschlagen.");
         }
       } else {
         toast.error("Fehler beim Erstellen des Stripe-Verbindungslinks.");
@@ -275,7 +289,7 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         deleteAccount,
         updateUserBalance, // Expose this for usePayments
-        updateStripeAccountId, // Expose this
+        updateStripeAccountId, // Expose this (though less critical now)
         connectStripeAccount, // Expose this
       }}
     >
