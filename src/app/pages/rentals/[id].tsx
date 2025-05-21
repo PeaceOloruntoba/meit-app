@@ -1,66 +1,110 @@
-import React, { useEffect, useState } from "react";
+// @/app/RentalDetailsScreen.tsx
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Modal,
   ActivityIndicator,
-  Alert,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useRental, Rental } from "@/hook/useRentals";
-import { useAuth } from "@/hook/useAuth";
-import { usePayments } from "@/hook/usePayment";
+import { Feather } from "@expo/vector-icons";
+import { useAuth } from "@/hook/useAuth"; // Adjust path as needed
+import usePayments from "@/hook/usePayment"; // Adjust path as needed
+import { useRental, Rental } from "@/hook/useRentals"; // Assuming you have this hook
+import { useStripe, CardField } from "@stripe/stripe-react-native"; // Import useStripe and CardField
 
 const RentalDetailsScreen = () => {
   const router = useRouter();
   const { id: rentalId } = useLocalSearchParams();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser } = useAuth(); // Assuming currentUser has uid
 
   const {
     rental,
     loading: rentalLoading,
     error: rentalError,
     getRentalById,
-    updateRentalPaymentStatus,
-    updateRentalStatus,
-  } = useRental();
+    updateRentalStatus, // We only need to update rental status here, payment status is via webhook
+  } = useRental(); // Your existing useRental hook
 
-  const { pay } = usePayments();
+  const { getPaymentIntentClientSecret } = usePayments(); // Only get client secret from payments hook
+  const { confirmPayment } = useStripe(); // Use confirmPayment from @stripe/stripe-react-native
+
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (rentalId) getRentalById(rentalId as string);
-  }, [rentalId]);
+    if (rentalId) {
+      getRentalById(rentalId as string);
+    }
+  }, [rentalId, getRentalById]);
 
   const handleUpdateRentalStatus = (
     status: "pending" | "cancelled" | "success" | "ongoing"
   ) => {
-    if (rental?.id) updateRentalStatus(rental.id, status);
+    if (rental?.id) {
+      updateRentalStatus(rental.id, status);
+    }
   };
 
   const handleMakePayment = async () => {
-    if (!rental) return;
+    if (!rental || !currentUser?.uid) {
+      setPaymentError("Mietdaten oder Benutzer nicht verfügbar."); // Rental data or user not available.
+      return;
+    }
+
     setIsPaying(true);
     setPaymentError(null);
+    setPaymentSuccess(false);
+
     try {
-      const paymentIntent = await pay(
-        rental.price * 100,
-        currentUser!.uid,
-        rental.id
+      // 1. Get clientSecret from your backend via usePayments hook
+      const clientSecret = await getPaymentIntentClientSecret(
+        rental.price, // Amount in EUR
+        rental.id!,
+        currentUser.uid
       );
-      if (paymentIntent?.status === "Succeeded") {
-        setPaymentSuccess(true);
-        updateRentalPaymentStatus(rental.id, "paid");
-      } else {
-        throw new Error("Zahlung nicht abgeschlossen.");
+
+      if (!clientSecret) {
+        setPaymentError("Konnte den Zahlungszweck nicht initialisieren."); // Could not initialize Payment Intent.
+        setIsPaying(false);
+        return;
       }
-    } catch (err: any) {
-      setPaymentError(err.message);
+
+      // 2. Confirm the Payment with @stripe/stripe-react-native's confirmPayment
+      // CardField automatically handles the payment method details.
+      const { error: confirmError, paymentIntent } = await confirmPayment(
+        clientSecret
+      );
+
+      if (confirmError) {
+        console.error("Zahlungsbestätigungsfehler:", confirmError); // Payment confirmation error:
+        setPaymentError(`Zahlung fehlgeschlagen: ${confirmError.message}`); // Payment failed:
+        setIsPaying(false);
+        return;
+      }
+
+      if (!paymentIntent || paymentIntent.status !== "Succeeded") {
+        // Note: Stripe's status is 'Succeeded'
+        setPaymentError("Zahlung war nicht erfolgreich."); // Payment was not successful.
+        setIsPaying(false);
+        return;
+      }
+
+      // 3. Payment successful! Backend webhook will update Firebase.
+      // Just refresh local rental data to reflect the change.
+      setPaymentSuccess(true);
+      setIsPaymentModalVisible(false); // Close modal on success
+      getRentalById(rental.id!); // Re-fetch rental data to update payment status from DB
+    } catch (error: any) {
+      console.error("Fehler beim Bezahlen:", error); // Error making payment:
+      setPaymentError(
+        `Zahlungsfehler: ${
+          error.message || "Ein unerwarteter Fehler ist aufgetreten."
+        }`
+      ); // Payment error: An unexpected error occurred.
     } finally {
       setIsPaying(false);
     }
@@ -248,6 +292,27 @@ const RentalDetailsScreen = () => {
                 Zahlung erfolgreich!
               </Text>
             )}
+
+            {/* CardField for secure card input */}
+            <View
+              style={{
+                height: 50,
+                marginVertical: 10,
+                borderColor: "gray",
+                borderWidth: 1,
+                borderRadius: 8,
+              }}
+            >
+              <CardField
+                postalCodeEnabled={false} // Adjust based on your needs
+                style={{ height: 50 }}
+                cardStyle={{
+                  backgroundColor: "#FFFFFF",
+                  textColor: "#000000",
+                  placeholderColor: "#A0A0A0",
+                }}
+              />
+            </View>
 
             <TouchableOpacity
               disabled={isPaying}
