@@ -44,6 +44,7 @@ const usePayments = () => {
               "Fehler beim Erstellen des Zahlungszwecks im Backend."
           ); // Error creating Payment Intent on backend.
         }
+        console.log(response.data)
         return response.data.clientSecret;
       } catch (error: any) {
         console.error(
