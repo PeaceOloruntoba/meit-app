@@ -34,9 +34,10 @@ export function usePayments() {
       }
 
       // 2. Confirm payment with Stripe React Native SDK
-      const { error: confirmError, paymentIntent } = await stripe.confirmPayment(clientSecret, {
-        type: "Card", // Adjust if you use other payment methods
-      });
+      const { error: confirmError, paymentIntent } =
+        await stripe.confirmPayment(clientSecret, {
+          paymentMethodType: "Card", // Adjust if you use other payment methods
+        });
 
       if (confirmError) {
         throw new Error(confirmError.message);
