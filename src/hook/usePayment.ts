@@ -9,13 +9,11 @@ export function usePayments() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Create payment intent on your backend and confirm payment with Stripe
   async function pay(amount: number, userId: string, rentalId: string) {
     setLoading(true);
     setError(null);
 
     try {
-      // 1. Create payment intent on backend
       const response = await fetch(`${BACKEND_URL}/create-payment-intent`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,10 +31,9 @@ export function usePayments() {
         throw new Error("No client secret returned from backend");
       }
 
-      // 2. Confirm payment with Stripe React Native SDK
       const { error: confirmError, paymentIntent } =
         await stripe.confirmPayment(clientSecret, {
-          paymentMethodType: "Card", // Adjust if you use other payment methods
+          paymentMethodType: "Card",
         });
 
       if (confirmError) {
@@ -56,7 +53,6 @@ export function usePayments() {
     }
   }
 
-  // Withdraw funds via your backend
   async function withdraw(amount: number, userId: string, stripeAccountId: string) {
     setLoading(true);
     setError(null);

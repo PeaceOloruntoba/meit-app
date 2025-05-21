@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { useAuth } from "@/hook/useAuth";
-import usePayments from "@/hook/usePayment";
+import { usePayments } from "@/hook/usePayment";
+import { toast } from "sonner-native";
 
 interface BankDetails {
   accountNumber: string;
@@ -22,40 +22,76 @@ const WalletScreen = () => {
   const { user, updateUserBalance } = useAuth();
   const [balance, setBalance] = useState<number>(0);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
+  const [withdrawAmount, setWithdrawAmount] = useState<string>("0");
   const [bankDetails, setBankDetails] = useState<BankDetails>({
     accountNumber: "",
-    bankCode: "",
+    bankCode: "DE", // You can change this default code as needed
     accountHolderName: "",
   });
-  const { withdrawFunds } = usePayments();
+  const { withdraw } = usePayments();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
-  function setIsWithdrawModalVisible(arg0: boolean): void {
-    throw new Error("Function not implemented.");
-  }
+  useEffect(() => {
+    if (user?.balance) {
+      setBalance(user.balance);
+    }
+  }, [user]);
 
-  function setWithdrawalAmount(text: string): void {
-    throw new Error("Function not implemented.");
-  }
+  const handleWithdraw = async () => {
+    const amountNum = parseFloat(withdrawAmount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
 
-  function setBankDetails(arg0: any): void {
-    throw new Error("Function not implemented.");
-  }
+    if (!bankDetails.accountNumber || !bankDetails.accountHolderName) {
+      toast.error("Please fill in all bank details.");
+      return;
+    }
 
-  function handleWithdraw(event: GestureResponderEvent): void {
-    throw new Error("Function not implemented.");
-  }
+    if (amountNum > balance) {
+      toast.error("Insufficient balance.");
+      return;
+    }
+
+    setIsWithdrawing(true);
+
+    try {
+      await withdraw({
+        amount: amountNum,
+        bankDetails,
+        userId: "userId",
+      });
+
+      const newBalance = balance - amountNum;
+      setBalance(newBalance);
+      updateUserBalance(newBalance); // optional if needed globally
+
+      toast.success("Withdrawal successful!");
+      setIsWithdrawModalVisible(false);
+      setWithdrawAmount("0");
+      setBankDetails({
+        accountNumber: "",
+        bankCode: "DE",
+        accountHolderName: "",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Withdrawal failed. Try again.");
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
 
   return (
     <View className="flex-1 bg-background p-4 pt-20">
       <View className="flex flex-row gap-4">
         <Feather name="credit-card" size={24} />
-        <Text className="text-2xl font-bold mb-4 text-textPrimary flex items-center gap-2">
+        <Text className="text-2xl font-bold mb-4 text-textPrimary">
           My Wallet
         </Text>
       </View>
+
       <View className="bg-white p-4 rounded-lg shadow-md mb-6">
         <Text className="text-lg font-semibold text-textPrimary">
           Your Balance
@@ -63,12 +99,7 @@ const WalletScreen = () => {
         <Text className="text-2xl font-bold text-green-600">
           {balance.toFixed(2)} €
         </Text>
-        <View className="flex flex-row items-center justify-between mt-6">
-          <Text className="text-lg">Account Balance</Text>
-          <Text className="text-5xl font-semibold">
-            €0.00
-          </Text>
-        </View>
+
         <TouchableOpacity
           onPress={() => setIsWithdrawModalVisible(true)}
           className="bg-blue-600 m-4 p-4 rounded-lg flex items-center"
@@ -79,31 +110,21 @@ const WalletScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => setIsWithdrawModalVisible(true)}
-        className="bg-blue-600 text-white py-3 px-6 rounded-md w-full"
-      >
-        <Text className="text-lg font-semibold flex items-center gap-2">
-          <Feather size={20} />
-          Withdraw Funds
-        </Text>
-      </TouchableOpacity>
 
       <Modal
         animationType="slide"
         transparent={true}
         visible={isWithdrawModalVisible}
-        onRequestClose={() => {
-          setIsWithdrawModalVisible(!isWithdrawModalVisible);
-        }}
+        onRequestClose={() => setIsWithdrawModalVisible(false)}
       >
         <View className="flex-1 justify-center items-center bg-black/50">
           <View className="bg-white p-6 rounded-lg w-4/5">
             <Text className="text-xl font-semibold mb-4">Withdrawal</Text>
+
             <TextInput
               placeholder="Withdrawal Amount"
-              value={withdrawalAmount}
-              onChangeText={setWithdrawalAmount}
+              value={withdrawAmount}
+              onChangeText={setWithdrawAmount}
               keyboardType="numeric"
               className="border p-2 mb-3 rounded-md"
             />
@@ -123,6 +144,7 @@ const WalletScreen = () => {
               }
               className="border p-2 mb-3 rounded-md"
             />
+
             <View className="flex flex-row justify-end mt-4">
               <TouchableOpacity
                 className="bg-gray-300 py-2 px-4 rounded-md mr-2"
@@ -131,12 +153,17 @@ const WalletScreen = () => {
               >
                 <Text>Cancel</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 className="bg-blue-600 py-2 px-4 rounded-md"
                 onPress={handleWithdraw}
                 disabled={isWithdrawing}
               >
-                <Text className="text-white">Withdraw</Text>
+                {isWithdrawing ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-white">Withdraw</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
