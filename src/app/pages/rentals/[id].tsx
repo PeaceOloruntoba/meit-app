@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Modal,
   ActivityIndicator,
+  Alert,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useRental, Rental } from "@/hook/useRentals";
 import { useAuth } from "@/hook/useAuth";
-import {usePayments} from "@/hook/usePayment";
+import { usePayments } from "@/hook/usePayment";
 
 const RentalDetailsScreen = () => {
   const router = useRouter();
   const { id: rentalId } = useLocalSearchParams();
+  const { user: currentUser } = useAuth();
+
   const {
     rental,
     loading: rentalLoading,
@@ -23,40 +26,43 @@ const RentalDetailsScreen = () => {
     updateRentalPaymentStatus,
     updateRentalStatus,
   } = useRental();
-  const { user: currentUser } = useAuth();
-  const {
-    isPaymentModalVisible,
-    setIsPaymentModalVisible,
-    paymentAmount,
-    handleMakePayment,
-    isPaying,
-    paymentError,
-    paymentSuccess,
-    stripe,
-    setRentalContext,
-  } = usePayments();
+
+  const { pay } = usePayments();
+  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (rentalId) {
-      getRentalById(rentalId as string);
-    }
-  }, [getRentalById, rentalId]);
-
-  useEffect(() => {
-    if (rental) {
-      setRentalContext(rental);
-    }
-  }, [rental]);
-
-  const navigateBack = () => {
-    router.back();
-  };
+    if (rentalId) getRentalById(rentalId as string);
+  }, [rentalId]);
 
   const handleUpdateRentalStatus = (
     status: "pending" | "cancelled" | "success" | "ongoing"
   ) => {
-    if (rental?.id) {
-      updateRentalStatus(rental.id, status);
+    if (rental?.id) updateRentalStatus(rental.id, status);
+  };
+
+  const handleMakePayment = async () => {
+    if (!rental) return;
+    setIsPaying(true);
+    setPaymentError(null);
+    try {
+      const paymentIntent = await pay(
+        rental.price * 100,
+        currentUser!.uid,
+        rental.id
+      );
+      if (paymentIntent?.status === "Succeeded") {
+        setPaymentSuccess(true);
+        updateRentalPaymentStatus(rental.id, "paid");
+      } else {
+        throw new Error("Zahlung nicht abgeschlossen.");
+      }
+    } catch (err: any) {
+      setPaymentError(err.message);
+    } finally {
+      setIsPaying(false);
     }
   };
 
@@ -75,6 +81,11 @@ const RentalDetailsScreen = () => {
     }
   };
 
+  const getPaymentStatusColor = (status: Rental["paymentStatus"]) =>
+    status === "paid"
+      ? "bg-green-200 text-green-800"
+      : "bg-red-200 text-red-800";
+
   const getStatusText = (status: Rental["rentalStatus"]) => {
     switch (status) {
       case "success":
@@ -88,16 +99,6 @@ const RentalDetailsScreen = () => {
       default:
         return "";
     }
-  };
-
-  const getPaymentStatusText = (status: Rental["paymentStatus"]) => {
-    return status === "paid" ? "Bezahlt" : "Unbezahlt";
-  };
-
-  const getPaymentStatusColor = (status: Rental["paymentStatus"]) => {
-    return status === "paid"
-      ? "bg-green-200 text-green-800"
-      : "bg-red-200 text-red-800";
   };
 
   if (rentalLoading) {
@@ -123,7 +124,7 @@ const RentalDetailsScreen = () => {
   return (
     <View className="flex-1 bg-background p-4 pt-20">
       <TouchableOpacity
-        onPress={navigateBack}
+        onPress={router.back}
         className="absolute top-20 right-4 bg-black rounded-md p-2 z-10"
       >
         <Feather name="x" size={24} color="white" />
@@ -142,18 +143,14 @@ const RentalDetailsScreen = () => {
 
       <View className="mb-4">
         <Text className="text-lg font-semibold text-textPrimary">Mieter</Text>
-        <Text className="text-textSecondary">
-          {rental.renter?.email || "Nicht verfügbar"}
-        </Text>
+        <Text className="text-textSecondary">{rental.renter?.email}</Text>
       </View>
 
       <View className="mb-4">
         <Text className="text-lg font-semibold text-textPrimary">
           Vermieter
         </Text>
-        <Text className="text-textSecondary">
-          {rental.owner?.email || "Nicht verfügbar"}
-        </Text>
+        <Text className="text-textSecondary">{rental.owner?.email}</Text>
       </View>
 
       <View className="mb-4">
@@ -161,70 +158,65 @@ const RentalDetailsScreen = () => {
         <Text className="text-textSecondary">{rental.price} €</Text>
       </View>
 
-      <View className="mb-4 flex flex-col items-center justify-center gap-4">
-        <View>
-          <Text className="text-lg font-semibold text-textPrimary">
-            Zahlungsstatus
-          </Text>
-          <Text
-            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getPaymentStatusColor(
-              rental.paymentStatus
-            )}`}
-          >
-            {getPaymentStatusText(rental.paymentStatus).toUpperCase()}
-          </Text>
-        </View>
+      <View className="mb-4 flex items-center gap-4">
+        <Text className="text-lg font-semibold text-textPrimary">
+          Zahlungsstatus
+        </Text>
+        <Text
+          className={`rounded-full px-3 py-1 text-sm font-medium ${getPaymentStatusColor(
+            rental.paymentStatus
+          )}`}
+        >
+          {rental.paymentStatus === "paid" ? "BEZAHLT" : "UNBEZAHLT"}
+        </Text>
+
         {isRenter && rental.paymentStatus === "unpaid" && (
           <TouchableOpacity
             onPress={() => setIsPaymentModalVisible(true)}
-            className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded-md"
+            className="bg-indigo-600 py-2 px-4 rounded-md"
           >
             <Text className="text-white">Jetzt bezahlen</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      <View className="mb-4 flex flex-col items-center justify-center gap-4">
-        <View>
-          <Text className="text-lg font-semibold text-textPrimary">
-            Mietstatus
-          </Text>
-          <Text
-            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(
-              rental.rentalStatus
-            )}`}
-          >
-            {getStatusText(rental.rentalStatus).toUpperCase()}
-          </Text>
-        </View>
+      <View className="mb-4 flex items-center gap-4">
+        <Text className="text-lg font-semibold text-textPrimary">
+          Mietstatus
+        </Text>
+        <Text
+          className={`rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(
+            rental.rentalStatus
+          )}`}
+        >
+          {getStatusText(rental.rentalStatus).toUpperCase()}
+        </Text>
 
-        <View className="flex flex-row items-center justify-center gap-6">
-          {isOwner && (
-            <View className="mt-2 flex items-center justify-center gap-4 flex-row space-x-2">
-              {rental.rentalStatus !== "success" && (
-                <TouchableOpacity
-                  onPress={() => handleUpdateRentalStatus("success")}
-                  className="bg-green-600 py-2 px-4 rounded-md"
-                >
-                  <Text className="text-white">Abschließen</Text>
-                </TouchableOpacity>
-              )}
-              {rental.rentalStatus !== "ongoing" &&
-                rental.paymentStatus === "paid" && (
-                  <TouchableOpacity
-                    onPress={() => handleUpdateRentalStatus("ongoing")}
-                    className="bg-blue-600 py-2 px-4 rounded-md"
-                  >
-                    <Text className="text-white">Als laufend markieren</Text>
-                  </TouchableOpacity>
-                )}
-            </View>
+        <View className="flex-row gap-3 mt-2">
+          {isOwner && rental.rentalStatus !== "success" && (
+            <TouchableOpacity
+              onPress={() => handleUpdateRentalStatus("success")}
+              className="bg-green-600 py-2 px-4 rounded-md"
+            >
+              <Text className="text-white">Abschließen</Text>
+            </TouchableOpacity>
           )}
+
+          {isOwner &&
+            rental.paymentStatus === "paid" &&
+            rental.rentalStatus !== "ongoing" && (
+              <TouchableOpacity
+                onPress={() => handleUpdateRentalStatus("ongoing")}
+                className="bg-blue-600 py-2 px-4 rounded-md"
+              >
+                <Text className="text-white">Laufend</Text>
+              </TouchableOpacity>
+            )}
 
           {(isOwner || isRenter) && rental.rentalStatus !== "cancelled" && (
             <TouchableOpacity
               onPress={() => handleUpdateRentalStatus("cancelled")}
-              className="mt-2 bg-red-600 py-2 px-4 rounded-md"
+              className="bg-red-600 py-2 px-4 rounded-md"
             >
               <Text className="text-white">Stornieren</Text>
             </TouchableOpacity>
@@ -234,49 +226,45 @@ const RentalDetailsScreen = () => {
 
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={isPaymentModalVisible}
         onRequestClose={() => setIsPaymentModalVisible(false)}
       >
-        <View className="flex-1 justify-center items-center bg-black/50">
+        <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white p-6 rounded-lg w-4/5">
             <Text className="text-xl font-semibold mb-4">
-              Zahlungsmethode wählen
+              Zahlung fortsetzen
             </Text>
-            <Text className="text-lg mb-4">
-              Zu zahlen: €{paymentAmount.toFixed(2)}
+            <Text className="text-lg mb-2">
+              Zu zahlen: €{rental.price.toFixed(2)}
             </Text>
 
             {paymentError && (
-              <Text className="text-red-500 mb-4">{paymentError}</Text>
+              <Text className="text-red-500 mb-2">{paymentError}</Text>
             )}
 
             {paymentSuccess && (
-              <View className="bg-green-100 border border-green-400 px-4 py-3 rounded mb-4">
-                <Text className="text-green-700 font-bold">
-                  Zahlung erfolgreich!
-                </Text>
-              </View>
+              <Text className="text-green-600 font-semibold mb-2">
+                Zahlung erfolgreich!
+              </Text>
             )}
 
             <TouchableOpacity
+              disabled={isPaying}
               onPress={handleMakePayment}
-              className="bg-blue-600 py-3 px-4 rounded-md mb-4"
-              disabled={isPaying || !stripe}
+              className="bg-blue-600 py-3 px-4 rounded-md mb-3"
             >
               <Text className="text-white text-lg">
-                {isPaying
-                  ? "Zahlung wird verarbeitet..."
-                  : "Mit Karte bezahlen"}
+                {isPaying ? "Zahle..." : "Mit Karte bezahlen"}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setIsPaymentModalVisible(false)}
-              className="bg-gray-300 py-3 px-4 rounded-md"
               disabled={isPaying}
+              className="bg-gray-300 py-2 px-4 rounded-md"
             >
-              <Text className="text-lg">Abbrechen</Text>
+              <Text>Abbrechen</Text>
             </TouchableOpacity>
           </View>
         </View>
