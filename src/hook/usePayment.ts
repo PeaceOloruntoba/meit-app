@@ -137,6 +137,8 @@ const usePayments = () => {
           }
         );
 
+        console.log(response)
+
         if (response.status !== 200) {
           toast.error(
             `Stripe-Fehler (Auszahlung): ${
