@@ -13,12 +13,31 @@ import {
 import { toast } from "sonner-native";
 import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { Alert } from "react-native";
+import * as WebBrowser from "expo-web-browser"; // For opening web links
 
 const AuthContext = createContext(null);
+
+// IMPORTANT: Use your actual Render.com backend base URL
+const RENDER_BACKEND_URL = "https://silver-train-c0k5.onrender.com";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Function to update the user object in context
+  const updateUserBalance = useCallback((newBalance: number) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      return { ...prevUser, accountBalance: newBalance };
+    });
+  }, []);
+
+  const updateStripeAccountId = useCallback((newStripeAccountId: string) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      return { ...prevUser, stripeAccountId: newStripeAccountId };
+    });
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -26,7 +45,8 @@ export const AuthProvider = ({ children }) => {
         const userDocRef = doc(db, "users", authUser.uid);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
-          setUser({ ...authUser, ...userDocSnap.data() }); // Merge Firebase Auth user with Firestore data
+          // Merge Firebase Auth user with Firestore data, including stripeAccountId
+          setUser({ ...authUser, ...userDocSnap.data() });
         } else {
           setUser(authUser); // User exists in Firebase Auth but not yet in Firestore
         }
@@ -54,10 +74,11 @@ export const AuthProvider = ({ children }) => {
         uid: uid,
         email: email,
         createdAt: new Date(),
-        ...additionalData, // Include the additional data passed from the registration form
+        accountBalance: 0, // Initialize balance for new users
+        stripeAccountId: null, // Initialize stripeAccountId as null
+        ...additionalData,
       });
 
-      // Optionally update the user's display name in Firebase Auth
       if (additionalData?.firstName || additionalData?.lastName) {
         await firebaseUpdateProfile(userCredential.user, {
           displayName: `${additionalData.firstName || ""} ${
@@ -66,7 +87,6 @@ export const AuthProvider = ({ children }) => {
         });
       }
 
-      // Fetch the newly created user document and update the state
       const userDocRef = doc(db, "users", uid);
       const userDocSnap = await getDoc(userDocRef);
       if (userDocSnap.exists()) {
@@ -123,14 +143,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Function to update the user's profile data in Firestore
   const updateProfile = async (uid, updatedData) => {
     setLoading(true);
     try {
       const userDocRef = doc(db, "users", uid);
-      await setDoc(userDocRef, updatedData, { merge: true }); // Use merge to update specific fields
+      await setDoc(userDocRef, updatedData, { merge: true });
 
-      // Optionally update the user's display name in Firebase Auth if firstName or lastName is updated
       if (updatedData?.firstName || updatedData?.lastName) {
         const currentAuthUser = auth.currentUser;
         if (currentAuthUser) {
@@ -144,7 +162,6 @@ export const AuthProvider = ({ children }) => {
       const userDocSnap = await getDoc(userDocRef);
       if (userDocSnap.exists()) {
         setUser({ ...auth.currentUser, ...userDocSnap.data() });
-        // toast.success("Profile updated successfully!");
       }
     } catch (error) {
       console.error("Profilaktualisierungsfehler:", error.message);
@@ -191,6 +208,61 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // New function to initiate Stripe Connect onboarding
+  const connectStripeAccount = async () => {
+    if (!user?.uid) {
+      toast.error(
+        "Bitte melden Sie sich an, um Ihr Stripe-Konto zu verbinden."
+      );
+      return;
+    }
+    try {
+      // Call your backend to create an account link
+      const response = await axios.post(
+        `${RENDER_BACKEND_URL}/api/miet-app/payments/create-account-link`,
+        {
+          userId: user.uid,
+          // The return_url and refresh_url will be handled by your backend.
+          // Ensure your backend's return_url points to a deep link in your app
+          // or a web page that then redirects to a deep link.
+        }
+      );
+
+      if (response.status === 200 && response.data.url) {
+        const { url } = response.data;
+        // Open the Stripe onboarding URL in a web browser
+        const result = await WebBrowser.openBrowserAsync(url);
+
+        // After the user completes the flow and is redirected back,
+        // you'll need a mechanism to update the user's stripeAccountId in Firebase.
+        // This is typically done via a backend webhook (account.updated event)
+        // or by checking the user's Stripe account status on return.
+        // For immediate feedback, you could re-fetch user data:
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setUser((prevUser) => ({ ...prevUser, ...userDocSnap.data() }));
+        }
+
+        if (result.type === "cancel") {
+          toast.info("Stripe-Verbindung abgebrochen.");
+        } else if (result.type === "success") {
+          // The actual stripeAccountId update should ideally come from a webhook
+          // or a dedicated backend endpoint that confirms the account is ready.
+          // For now, we'll rely on the re-fetch above.
+          toast.success(
+            "Stripe-Verbindung möglicherweise erfolgreich. Überprüfen Sie Ihr Profil."
+          );
+        }
+      } else {
+        toast.error("Fehler beim Erstellen des Stripe-Verbindungslinks.");
+      }
+    } catch (error: any) {
+      console.error("Fehler beim Verbinden des Stripe-Kontos:", error.message);
+      toast.error(`Fehler beim Verbinden des Stripe-Kontos: ${error.message}`);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -201,6 +273,9 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateProfile,
         deleteAccount,
+        updateUserBalance, // Expose this for usePayments
+        updateStripeAccountId, // Expose this
+        connectStripeAccount, // Expose this
       }}
     >
       {children}
