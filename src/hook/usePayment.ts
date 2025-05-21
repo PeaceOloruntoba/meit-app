@@ -1,6 +1,6 @@
 // @/hook/usePayment.ts
 import { useState, useEffect, useCallback } from "react";
-import { doc, getDoc } from "firebase/firestore"; // Still needed for updateUserBalance refresh
+import { doc, getDoc, runTransaction } from "firebase/firestore"; // Added runTransaction for updateOwnerBalance
 import { db } from "firebaseConfig"; // Adjust path as needed
 import { toast } from "sonner-native";
 import axios from "axios";
@@ -16,6 +16,8 @@ interface BankDetails {
 
 const usePayments = () => {
   const { user, updateUserBalance } = useAuth();
+  // The platform fee is handled by the backend, but we keep it here for consistency if client-side logic needs it.
+  const PLATFORM_FEE = 0.5; // Assuming this is the same as in your backend
 
   /**
    * Calls the backend to create a Payment Intent and returns its clientSecret.
@@ -44,7 +46,7 @@ const usePayments = () => {
               "Fehler beim Erstellen des Zahlungszwecks im Backend."
           ); // Error creating Payment Intent on backend.
         }
-        console.log(response.data)
+        console.log(response.data);
         return response.data.clientSecret;
       } catch (error: any) {
         console.error(
@@ -58,6 +60,45 @@ const usePayments = () => {
       }
     },
     [user]
+  );
+
+  /**
+   * Updates the owner's account balance in Firebase after a successful payment.
+   * This is for immediate client-side feedback. The backend webhook will also update this.
+   */
+  const updateOwnerBalance = useCallback(
+    async (ownerId: string, amount: number): Promise<boolean> => {
+      try {
+        await runTransaction(db, async (transaction) => {
+          const ownerRef = doc(db, "users", ownerId);
+          const ownerDoc = await transaction.get(ownerRef);
+
+          if (!ownerDoc.exists()) {
+            throw new Error("Eigentümerdokument nicht gefunden."); // Owner document not found.
+          }
+
+          const currentBalance = ownerDoc.data()?.accountBalance || 0;
+          // Add the amount minus the platform fee to the owner's balance
+          transaction.update(ownerRef, {
+            accountBalance: currentBalance + (amount - PLATFORM_FEE),
+          });
+        });
+        console.log(
+          `Owner ${ownerId} balance updated successfully on frontend.`
+        );
+        return true;
+      } catch (error: any) {
+        console.error(
+          "Fehler beim Aktualisieren des Eigentümerguthabens:",
+          error.message
+        ); // Error updating owner balance:
+        toast.error(
+          `Fehler beim Aktualisieren des Eigentümerguthabens: ${error.message}`
+        ); // Error updating owner balance:
+        return false;
+      }
+    },
+    [PLATFORM_FEE] // Dependency on PLATFORM_FEE
   );
 
   /**
@@ -127,7 +168,7 @@ const usePayments = () => {
     [user, updateUserBalance]
   );
 
-  return { getPaymentIntentClientSecret, withdrawFunds };
+  return { getPaymentIntentClientSecret, withdrawFunds, updateOwnerBalance }; // Export new function
 };
 
 export default usePayments;
