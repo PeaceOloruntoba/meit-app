@@ -273,7 +273,7 @@ export const AuthProvider = ({ children }) => {
         toast.error("Fehler beim Erstellen des Stripe-Verbindungslinks.");
       }
     } catch (error: any) {
-      console.error("Fehler beim Verbinden des Stripe-Kontos:", error.message);
+      console.error("Fehler beim Verbinden des Stripe-Kontos:", error);
       toast.error(`Fehler beim Verbinden des Stripe-Kontos: ${error.message}`);
     }
   };
