@@ -70,7 +70,7 @@ const EditProfileScreen = () => {
         //  backIdImageUrl: backIdImage,    // upload and get url
       };
 
-      await updateProfile(user.uid, updatedData); // Call updateProfile from hook
+      await updateProfile(user.uid, updatedData);
       toast.success("Profil erfolgreich aktualisiert!");
       router.push("/pages/profile");
     } catch (err: any) {
